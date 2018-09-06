@@ -32,7 +32,7 @@ data class AirQualityLog(
         val indexRaw: Int,
 
         @ColumnInfo(name = "station_id")
-        val stationId: Int,
+        val stationId: Long,
 
         @ColumnInfo(name = "error_code")
         val errorCode: Int,
