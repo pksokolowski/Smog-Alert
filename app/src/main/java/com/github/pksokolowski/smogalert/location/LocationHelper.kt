@@ -17,7 +17,7 @@ class LocationHelper @Inject constructor(appContext: Application, private val av
 
     class LocationResult(val location: Location?, val errorCode: Int)
 
-    fun getLastLocation(): LocationResult {
+    fun getLastLocationData(): LocationResult {
         if (!availabilityHelper.checkGoogleApiAvailability()) {
             return LocationResult(null, GOOGLE_LOCATION_API_IS_UNAVAILABLE)
         }

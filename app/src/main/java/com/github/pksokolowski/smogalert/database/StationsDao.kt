@@ -1,8 +1,6 @@
 package com.github.pksokolowski.smogalert.database
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 
 @Dao
 interface StationsDao {
@@ -11,4 +9,10 @@ interface StationsDao {
 
     @Insert
     fun insertStations(stations: List<Station>)
+
+    @Update
+    fun updateStations(stations: List<Station>)
+
+    @Delete
+    fun deleteStations(stations: List<Station>)
 }

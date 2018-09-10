@@ -73,15 +73,15 @@ class LocationAvailabilityHelper @Inject constructor(private val appContext: App
      * @param activity if set, the method will show a permission request dialog if needed.
      */
     fun checkLocationPermission(activity: AppCompatActivity? = null): Boolean {
-        if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             return true
         }
 
         if (activity != null) {
             ActivityCompat.requestPermissions(activity,
-                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                    PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
 
         }
 
@@ -111,7 +111,7 @@ class LocationAvailabilityHelper @Inject constructor(private val appContext: App
 
     companion object {
         private const val PLAY_SERVICES_RESOLUTION_REQUEST = 9000
-        private const val PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 0
+        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0
         private const val REQUEST_CHECK_SETTINGS = 1
     }
 }

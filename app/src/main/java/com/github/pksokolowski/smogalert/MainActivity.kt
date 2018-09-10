@@ -1,14 +1,13 @@
 package com.github.pksokolowski.smogalert
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
-import com.github.pksokolowski.smogalert.location.LocationHelper
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -28,5 +27,14 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
 
         locationAvailabilityHelper.checkAvailabilityAndPromptUserIfNeeded(this)
+
+
+        viewModel.getAirQualityInfo().observe(this, Observer {
+            textView.text = it.toString()
+        })
+
+        a_button.setOnClickListener {
+            viewModel.checkCurrentAirQuality()
+        }
     }
 }

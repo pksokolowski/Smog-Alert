@@ -23,21 +23,35 @@ import android.arch.persistence.room.PrimaryKey
 data class AirQualityLog(
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "id")
-        val id: Long,
+        val id: Long = 0,
 
         @ColumnInfo(name = "verdict")
-        val verdict: Int,
+        val verdict: Int = -1,
 
         @ColumnInfo(name = "raw_index")
-        val indexRaw: Int,
+        val indexRaw: Int = -1,
 
         @ColumnInfo(name = "station_id")
-        val stationId: Long,
+        val stationId: Long = -1,
 
         @ColumnInfo(name = "error_code")
-        val errorCode: Int,
+        val errorCode: Int = 0,
 
         @ColumnInfo(name = "time_stamp")
         val timeStamp: Long
 
-)
+) {
+    fun assignId(id: Long) =
+            AirQualityLog(id, verdict, indexRaw, stationId, errorCode, timeStamp)
+
+    companion object {
+        const val ERROR_CODE_SUCCESS = 0
+        const val ERROR_CODE_LOCATION_MISSING = 1
+        const val ERROR_CODE_STATION_MISSING = 2
+        const val ERROR_CODE_AIR_QUALITY_MISSING = 3
+
+        const val VERDICT_ACCEPTABLE = 0
+        const val VERDICT_ALARMING = 10
+    }
+
+}

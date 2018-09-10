@@ -10,9 +10,6 @@ data class Station(
         @ColumnInfo(name = "id")
         val id: Long,
 
-        @ColumnInfo(name = "active_status")
-        val activeStatus: Boolean,
-
         @ColumnInfo(name = "latitude")
         val latitude: Double,
 
