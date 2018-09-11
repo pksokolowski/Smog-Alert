@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface StationsService {
 
-    @get:GET("station/findAll")
-    val getStations: Call<List<StationModel>>
+    @GET("station/findAll")
+    fun getStations(): Call<List<StationModel>>
 }

@@ -42,10 +42,15 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                         timeStamp = timeStamp)
 
         val call = airQualityService.getCurrentAQ(stationId)
-        val apiResponse = call.execute().body()
+        val apiResponse = try {call.execute().body()
                 ?: return AirQualityLog(stationId = stationId,
                         errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
                         timeStamp = timeStamp)
+        } catch (e: Exception){
+            return  AirQualityLog(stationId = stationId,
+                    errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
+                    timeStamp = timeStamp)
+        }
 
         val airQualityIndex = apiResponse.stIndexLevel?.id ?: -1
 
@@ -84,6 +89,6 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     private companion object {
-        const val ACCEPTABLE_LOG_AGE = 20 * 60000
+        const val ACCEPTABLE_LOG_AGE = 30 * 60000
     }
 }

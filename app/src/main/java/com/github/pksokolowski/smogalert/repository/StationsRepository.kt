@@ -23,8 +23,13 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
                 metadataHelper.setNextUpdateTime(timeNow + CACHE_UPDATE_INTERVAL_AFTER_SUCCESS)
                 updateResult.stations
             } else {
-                metadataHelper.incrementFailedUpdatesCount()
-                metadataHelper.setNextUpdateTime(timeNow + CACHE_UPDATE_INTERVAL_AFTER_FAILURE)
+                val updateInterval = if (updateResult.stations.isNotEmpty()) CACHE_UPDATE_INTERVAL_AFTER_FAILURE
+                else CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE
+
+                with(metadataHelper) {
+                    incrementFailedUpdatesCount()
+                    setNextUpdateTime(timeNow + updateInterval)
+                }
                 updateResult.stations
             }
         }
@@ -77,7 +82,11 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
     }
 
     private fun getStationsFromApi(): List<Station>? {
-        val stationsFromApi = stationsService.getStations.execute().body() ?: return null
+        val stationsFromApi = try {
+            stationsService.getStations().execute().body() ?: return null
+        } catch (e: Exception) {
+            return null
+        }
 
         return List(stationsFromApi.size) { i ->
             StationDataConverter.toStation(stationsFromApi[i]) ?: return null
@@ -89,6 +98,7 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
         const val FAILURE = 1
         private const val DAY_IN_MILLIS = 86400000L
         const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE = 3 * DAY_IN_MILLIS
+        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE = 30 * 60000L
         const val CACHE_UPDATE_INTERVAL_AFTER_SUCCESS = 30 * DAY_IN_MILLIS
     }
 
