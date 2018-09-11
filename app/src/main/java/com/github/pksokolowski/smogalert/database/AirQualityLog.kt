@@ -25,9 +25,6 @@ data class AirQualityLog(
         @ColumnInfo(name = "id")
         val id: Long = 0,
 
-        @ColumnInfo(name = "verdict")
-        val verdict: Int = -1,
-
         @ColumnInfo(name = "raw_index")
         val indexRaw: Int = -1,
 
@@ -42,7 +39,7 @@ data class AirQualityLog(
 
 ) {
     fun assignId(id: Long) =
-            AirQualityLog(id, verdict, indexRaw, stationId, errorCode, timeStamp)
+            AirQualityLog(id, indexRaw, stationId, errorCode, timeStamp)
 
     companion object {
         const val ERROR_CODE_SUCCESS = 0
@@ -50,9 +47,6 @@ data class AirQualityLog(
         const val ERROR_CODE_STATION_MISSING = 2
         const val ERROR_CODE_STATIONS_TOO_FAR_AWAY = 3
         const val ERROR_CODE_AIR_QUALITY_MISSING = 4
-
-        const val VERDICT_ACCEPTABLE = 0
-        const val VERDICT_ALARMING = 10
     }
 
 }

@@ -8,8 +8,6 @@ import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATION_MISSING
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_SUCCESS
-import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.VERDICT_ACCEPTABLE
-import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.VERDICT_ALARMING
 import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
 import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.location.LocationHelper
@@ -60,15 +58,10 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         val airQualityIndex = apiResponse.stIndexLevel?.id ?: -1
 
         return AirQualityLog(0,
-                generateVerdict(airQualityIndex),
                 airQualityIndex,
                 stationId,
                 ERROR_CODE_SUCCESS,
                 timeStamp)
-    }
-
-    private fun generateVerdict(rawIndex: Int): Int{
-        return if(rawIndex >= 4) VERDICT_ALARMING else VERDICT_ACCEPTABLE
     }
 
     private fun getNearestStationID(location: Location): Long? {
