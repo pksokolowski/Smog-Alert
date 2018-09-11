@@ -48,7 +48,8 @@ data class AirQualityLog(
         const val ERROR_CODE_SUCCESS = 0
         const val ERROR_CODE_LOCATION_MISSING = 1
         const val ERROR_CODE_STATION_MISSING = 2
-        const val ERROR_CODE_AIR_QUALITY_MISSING = 3
+        const val ERROR_CODE_STATIONS_TOO_FAR_AWAY = 3
+        const val ERROR_CODE_AIR_QUALITY_MISSING = 4
 
         const val VERDICT_ACCEPTABLE = 0
         const val VERDICT_ALARMING = 10

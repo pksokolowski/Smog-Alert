@@ -5,6 +5,7 @@ import com.github.pksokolowski.smogalert.airquality.AirQualityService
 import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_AIR_QUALITY_MISSING
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_LOCATION_MISSING
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATION_MISSING
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_SUCCESS
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.VERDICT_ACCEPTABLE
@@ -40,6 +41,10 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         val stationId = getNearestStationID(location)
                 ?: return AirQualityLog(errorCode = ERROR_CODE_STATION_MISSING,
                         timeStamp = timeStamp)
+        if(stationId == -1L){
+            return AirQualityLog(errorCode = ERROR_CODE_STATIONS_TOO_FAR_AWAY,
+                    timeStamp = timeStamp)
+        }
 
         val call = airQualityService.getCurrentAQ(stationId)
         val apiResponse = try {call.execute().body()
@@ -71,7 +76,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         if (stations.isEmpty()) return null
 
         // find the nearest station
-        var minDistance = 10000000F
+        var minDistance = 10000F
         var idWithMinDistance = -1L
         stations.forEach {
             val stationLocation = Location("station").apply {
