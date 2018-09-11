@@ -55,7 +55,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                     timeStamp = timeStamp)
         }
 
-        val airQualityIndex = apiResponse.stIndexLevel?.id ?: -1
+        val airQualityIndex = apiResponse.indexLevel?.value ?: -1
 
         return AirQualityLog(0,
                 airQualityIndex,

@@ -10,8 +10,8 @@ class StationDataConverter{
     companion object {
         fun toStation(stationModel: StationModel): Station? {
             val id = stationModel.id?.toLong() ?: return null
-            val latitude = stationModel.gegrLat?.toDouble() ?: return null
-            val longitude = stationModel.gegrLon?.toDouble() ?: return null
+            val latitude = stationModel.latitude?.toDouble() ?: return null
+            val longitude = stationModel.longitude?.toDouble() ?: return null
 
             return Station(id, latitude, longitude)
         }

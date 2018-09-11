@@ -11,9 +11,9 @@ class StationModel {
     var id: Int? = null
     @SerializedName("gegrLat")
     @Expose
-    var gegrLat: String? = null
+    var latitude: String? = null
     @SerializedName("gegrLon")
     @Expose
-    var gegrLon: String? = null
+    var longitude: String? = null
 
 }

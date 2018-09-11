@@ -32,7 +32,6 @@ class MainActivityViewModel @Inject constructor(private val airQualityLogsReposi
 
         override fun onPostExecute(result: AirQualityLog) {
             super.onPostExecute(result)
-            val message = result.toString()
             outputLiveData.value = result
         }
     }

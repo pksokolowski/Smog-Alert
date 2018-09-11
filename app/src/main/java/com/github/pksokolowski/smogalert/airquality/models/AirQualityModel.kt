@@ -11,11 +11,11 @@ class AirQualityModel {
     var id: Int? = null
     @SerializedName("stIndexLevel")
     @Expose
-    var stIndexLevel: StIndexLevel? = null
+    var indexLevel: IndexLevel? = null
 
-    class StIndexLevel {
+    class IndexLevel {
         @SerializedName("id")
         @Expose
-        var id: Int? = null
+        var value: Int? = null
     }
 }
