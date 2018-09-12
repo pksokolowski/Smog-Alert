@@ -11,10 +11,6 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject constructor(private val airQualityLogsRepository: AirQualityLogsRepository) : ViewModel() {
     private val airQualityInfo = MutableLiveData<AirQualityLog>()
 
-    init {
-        checkCurrentAirQuality()
-    }
-
     fun getAirQualityInfo(): LiveData<AirQualityLog> {
         return airQualityInfo
     }
