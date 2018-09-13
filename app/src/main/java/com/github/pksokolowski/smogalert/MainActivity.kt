@@ -6,6 +6,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
+import com.github.pksokolowski.smogalert.notifications.NotificationHelper
+import com.github.pksokolowski.smogalert.utils.TimeHelper
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -20,6 +22,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainActivityViewModel
 
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -30,11 +35,26 @@ class MainActivity : AppCompatActivity() {
 
 
         viewModel.getAirQualityInfo().observe(this, Observer {
-            textView.text = it.toString()
+            if (it == null) {
+                textView.text = "log is null"
+                return@Observer
+            }
+            val timeStamp = TimeHelper.getTimeStampString(it.timeStamp)
+            textView.text = "${it.toString()}\n\n$timeStamp"
+
+            notificationHelper.showAlert(it)
         })
 
         a_button.setOnClickListener {
             viewModel.checkCurrentAirQuality()
+        }
+
+        enable_alarms_button.setOnClickListener{
+            viewModel.setAlarmsEnabled(true)
+        }
+
+        disable_alarms_button.setOnClickListener {
+            viewModel.setAlarmsEnabled(false)
         }
     }
 }

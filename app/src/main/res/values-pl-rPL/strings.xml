@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Obserwator Smogu</string>
+    <string name="notification_channel_alerts_title">Ostrzeżenia o smogu</string>
+    <string name="notification_channel_alerts_description">Powiadomienia o wysokich stężeniach szkodliwych substancji w powietrzu.</string>
 </resources>
