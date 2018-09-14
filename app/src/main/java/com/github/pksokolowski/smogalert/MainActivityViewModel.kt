@@ -1,15 +1,17 @@
 package com.github.pksokolowski.smogalert
 
+import android.app.Application
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
-import com.github.pksokolowski.smogalert.alarms.AlarmHelper
+import android.widget.Toast
 import com.github.pksokolowski.smogalert.database.AirQualityLog
+import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import javax.inject.Inject
 
-class MainActivityViewModel @Inject constructor(private val airQualityLogsRepository: AirQualityLogsRepository, private val alarmHelper: AlarmHelper) : ViewModel() {
+class MainActivityViewModel @Inject constructor(private val context: Application, private val airQualityLogsRepository: AirQualityLogsRepository, private val jobsHelper: JobsHelper) : ViewModel() {
     private val airQualityInfo = MutableLiveData<AirQualityLog>()
 
     fun getAirQualityInfo(): LiveData<AirQualityLog> {
@@ -21,8 +23,13 @@ class MainActivityViewModel @Inject constructor(private val airQualityLogsReposi
         task.execute()
     }
 
-    fun setAlarmsEnabled(enabled: Boolean){
-        alarmHelper.setAlarmsEnabled(enabled)
+    fun setAirCheckEnabled(enabled: Boolean) {
+        if (enabled)
+            if(!jobsHelper.scheduleAirQualityCheckJob()){
+                Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
+            }
+        else
+            jobsHelper.unScheduleAirQualityCheckJob()
     }
 
     private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository, private val outputLiveData: MutableLiveData<AirQualityLog>) : AsyncTask<Void, Void, AirQualityLog>() {

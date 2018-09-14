@@ -2,16 +2,14 @@ package com.github.pksokolowski.smogalert.di
 
 import android.app.Activity
 import android.app.Application
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.support.v4.app.Fragment
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import dagger.android.HasBroadcastReceiverInjector
+import dagger.android.*
 import dagger.android.support.HasSupportFragmentInjector
 import javax.inject.Inject
 
-class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasBroadcastReceiverInjector {
+class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasBroadcastReceiverInjector, HasServiceInjector {
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
@@ -21,6 +19,9 @@ class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasB
 
     @Inject
     lateinit var dispatchingBroadcastInjector: DispatchingAndroidInjector<BroadcastReceiver>
+
+    @Inject
+    lateinit var dispatchingServiceInjector: DispatchingAndroidInjector<Service>
 
     override fun onCreate() {
         super.onCreate()
@@ -41,5 +42,9 @@ class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasB
 
     override fun broadcastReceiverInjector(): AndroidInjector<BroadcastReceiver> {
         return dispatchingBroadcastInjector
+    }
+
+    override fun serviceInjector(): AndroidInjector<Service> {
+        return dispatchingServiceInjector
     }
 }

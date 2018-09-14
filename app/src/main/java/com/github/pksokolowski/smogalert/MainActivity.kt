@@ -22,9 +22,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainActivityViewModel
 
-    @Inject
-    lateinit var notificationHelper: NotificationHelper
-
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -41,8 +38,6 @@ class MainActivity : AppCompatActivity() {
             }
             val timeStamp = TimeHelper.getTimeStampString(it.timeStamp)
             textView.text = "${it.toString()}\n\n$timeStamp"
-
-            notificationHelper.showAlert(it)
         })
 
         a_button.setOnClickListener {
@@ -50,11 +45,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         enable_alarms_button.setOnClickListener{
-            viewModel.setAlarmsEnabled(true)
+            viewModel.setAirCheckEnabled(true)
         }
 
         disable_alarms_button.setOnClickListener {
-            viewModel.setAlarmsEnabled(false)
+            viewModel.setAirCheckEnabled(false)
         }
     }
 }

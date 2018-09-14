@@ -14,7 +14,7 @@ import dagger.Provides
 import dagger.android.AndroidInjectionModule
 import dagger.android.support.AndroidSupportInjectionModule
 
-@Module(includes = [ViewModelModule::class, BroadcastReceiversModule::class, AndroidInjectionModule::class, AndroidSupportInjectionModule::class])
+@Module(includes = [ViewModelModule::class, AndroidInjectionModule::class, AndroidSupportInjectionModule::class])
 open class AppModule {
 
     @PerApp
