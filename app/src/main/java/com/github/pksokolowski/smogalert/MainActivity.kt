@@ -3,13 +3,13 @@ package com.github.pksokolowski.smogalert
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.SeekBar
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
-import com.github.pksokolowski.smogalert.utils.TimeHelper
+import com.github.pksokolowski.smogalert.utils.AirQualityIndexHelper
+import com.github.pksokolowski.smogalert.utils.ErrorExplanationHelper
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -34,12 +34,14 @@ class MainActivity : AppCompatActivity() {
 
 
         viewModel.getAirQualityInfo().observe(this, Observer {
-            if (it == null) {
-                return@Observer
-            }
-            val timeStamp = TimeHelper.getTimeStampString(it.timeStamp)
+            if (it == null) return@Observer
+            val index = it.airQualityIndex
+            val textColor = AirQualityIndexHelper.getColor(index, this)
 
-            textView.text = "${it.toString()}\n\n$timeStamp"
+            air_quality_textview.text = AirQualityIndexHelper.getTitle(index, this)
+            air_quality_textview.setTextColor(textColor)
+
+            explanationTextView.text = ErrorExplanationHelper.explain(it, this)
         })
 
         viewModel.getDownloadStatus().observe(this, Observer {

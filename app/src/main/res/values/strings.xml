@@ -2,4 +2,21 @@
     <string name="app_name">Smog Alert</string>
     <string name="notification_channel_alerts_title">Smog alerts</string>
     <string name="notification_channel_alerts_description">Notifications letting you know about poor air quality</string>
+    <string name="error_explanation_server">Server didn\'t have the data</string>
+    <string name="error_explanation_location">Location wasn\'t available</string>
+    <string name="error_explanation_stations_missing">Stations data were missing</string>
+    <string name="error_explanation_stations_far_away">No station within 10km radius</string>
+    <string name="error_explanation_connection">Connection failure</string>
+    <string name="error_explanation_unknown">Unknown error</string>
+    <string name="air_quality_header">Air Quality</string>
+
+    <array name="index_level_titles">
+        <item>Very good</item>
+        <item>Good</item>
+        <item>Moderate</item>
+        <item>Sufficient</item>
+        <item>Bad</item>
+        <item>Very bad</item>
+        <item>Unknown</item>
+    </array>
 </resources>

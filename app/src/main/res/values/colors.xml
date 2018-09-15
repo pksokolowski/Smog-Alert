@@ -3,4 +3,16 @@
     <color name="colorPrimary">#b53f3f</color>
     <color name="colorPrimaryDark">#9f3430</color>
     <color name="colorAccent">#14e117</color>
+
+    <color name="color_at_index_0">#1e5903</color>
+
+    <array name="air_quality_index_colors">
+        <item>#009600</item>
+        <item>#64ff3d</item>
+        <item>#e4dc00</item>
+        <item>#ff7b00</item>
+        <item>#ff463d</item>
+        <item>#fa0000</item>
+        <item>#585858</item>
+    </array>
 </resources>

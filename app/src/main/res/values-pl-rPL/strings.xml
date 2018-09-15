@@ -3,4 +3,22 @@
     <string name="app_name">Obserwator Smogu</string>
     <string name="notification_channel_alerts_title">Ostrzeżenia o smogu</string>
     <string name="notification_channel_alerts_description">Powiadomienia o wysokich stężeniach szkodliwych substancji w powietrzu.</string>
+    <string name="error_explanation_server">Brak danych na serverze</string>
+    <string name="error_explanation_location">Lokalizacja niedostępna</string>
+    <string name="error_explanation_stations_missing">Brak danych o stacjach</string>
+    <string name="error_explanation_stations_far_away">Brak stacji w promieniu 10km</string>
+    <string name="error_explanation_connection">Błąd połączenia internetowego</string>
+    <string name="error_explanation_unknown">Nieznany błąd</string>
+    <string name="air_quality_header">Jakość powietrza</string>
+
+
+    <array name="index_level_titles">
+        <item>Bardzo dobry</item>
+        <item>Dobry</item>
+        <item>Umiarkowany</item>
+        <item>Dostateczny</item>
+        <item>Zły</item>
+        <item>Bardzo zły</item>
+        <item>Brak danych</item>
+    </array>
 </resources>
