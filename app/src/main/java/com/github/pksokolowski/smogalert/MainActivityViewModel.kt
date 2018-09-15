@@ -55,7 +55,7 @@ class MainActivityViewModel @Inject constructor(private val context: Application
 
         override fun onPostExecute(result: AirQualityLog) {
             super.onPostExecute(result)
-           // isDownloadInProgress.value = false
+            isDownloadInProgress.value = false
         }
     }
 
