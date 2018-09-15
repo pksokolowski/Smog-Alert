@@ -3,8 +3,10 @@ package com.github.pksokolowski.smogalert
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.SeekBar
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
 import com.github.pksokolowski.smogalert.utils.TimeHelper
@@ -33,16 +35,19 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getAirQualityInfo().observe(this, Observer {
             if (it == null) {
-                textView.text = "log is null"
                 return@Observer
             }
             val timeStamp = TimeHelper.getTimeStampString(it.timeStamp)
+
             textView.text = "${it.toString()}\n\n$timeStamp"
         })
 
-        a_button.setOnClickListener {
-            viewModel.checkCurrentAirQuality()
-        }
+        viewModel.getDownloadStatus().observe(this, Observer {
+            if (it == true) {
+                progressBar.visibility = View.VISIBLE
+            } else
+                progressBar.visibility = View.INVISIBLE
+        })
 
         viewModel.getSensitivity().observe(this, Observer {
             setting_seek_bar.progress = it ?: 0
@@ -57,5 +62,10 @@ class MainActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {}
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkCurrentAirQuality()
     }
 }

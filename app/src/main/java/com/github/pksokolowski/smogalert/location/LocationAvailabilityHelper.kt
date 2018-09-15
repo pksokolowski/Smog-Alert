@@ -25,10 +25,17 @@ class LocationAvailabilityHelper @Inject constructor(private val appContext: App
 
     fun checkAvailabilityAndPromptUserIfNeeded(activity: AppCompatActivity) {
         // API must first be in place to prevent potential crashes if used in below methods
-        if(!checkGoogleApiAvailability(activity)) return
+        if (!checkGoogleApiAvailability(activity)) return
 
         checkLocationPermission(activity)
         checkLocationSettings(activity)
+    }
+
+    fun checkOverallAvailability(): Boolean {
+        if (checkGoogleApiAvailability()
+                && checkLocationEnabled()
+                && checkLocationPermission()) return true
+        return false
     }
 
     private fun createLocationRequest(): LocationRequest {

@@ -9,19 +9,28 @@ import android.widget.Toast
 import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
+import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import javax.inject.Inject
 
-class MainActivityViewModel @Inject constructor(private val context: Application, private val airQualityLogsRepository: AirQualityLogsRepository, private val jobsHelper: JobsHelper) : ViewModel() {
-    private val airQualityInfo = MutableLiveData<AirQualityLog>()
+class MainActivityViewModel @Inject constructor(private val context: Application,
+                                                private val airQualityLogsRepository: AirQualityLogsRepository,
+                                                private val jobsHelper: JobsHelper,
+                                                private val locationAvailabilityHelper: LocationAvailabilityHelper) : ViewModel() {
+
+    private val airQualityInfo = airQualityLogsRepository.getCachedLog()
+    private val isDownloadInProgress = MutableLiveData<Boolean>()
     private val sensitivity = MutableLiveData<Int>()
             .apply { value = jobsHelper.getAirCheckParams().sensitivity }
 
-    fun getAirQualityInfo() = airQualityInfo as LiveData<AirQualityLog>
+    fun getAirQualityInfo() = airQualityInfo
+    fun getDownloadStatus() = isDownloadInProgress as LiveData<Boolean>
     fun getSensitivity() = sensitivity as LiveData<Int>
 
     fun checkCurrentAirQuality() {
-        val task = AirQualityDataFetcher(airQualityLogsRepository, airQualityInfo)
+        if (!locationAvailabilityHelper.checkOverallAvailability()) return
+
+        val task = AirQualityDataFetcher(airQualityLogsRepository, isDownloadInProgress)
         task.execute()
     }
 
@@ -32,7 +41,13 @@ class MainActivityViewModel @Inject constructor(private val context: Application
         }
     }
 
-    private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository, private val outputLiveData: MutableLiveData<AirQualityLog>) : AsyncTask<Void, Void, AirQualityLog>() {
+    private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository,
+                                        private val isDownloadInProgress: MutableLiveData<Boolean>) : AsyncTask<Void, Void, AirQualityLog>() {
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            isDownloadInProgress.value = true
+        }
 
         override fun doInBackground(vararg params: Void?): AirQualityLog {
             return repo.getLatestLog()
@@ -40,7 +55,8 @@ class MainActivityViewModel @Inject constructor(private val context: Application
 
         override fun onPostExecute(result: AirQualityLog) {
             super.onPostExecute(result)
-            outputLiveData.value = result
+           // isDownloadInProgress.value = false
         }
     }
+
 }

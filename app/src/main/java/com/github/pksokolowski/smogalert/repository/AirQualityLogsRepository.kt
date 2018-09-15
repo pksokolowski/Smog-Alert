@@ -1,5 +1,6 @@
 package com.github.pksokolowski.smogalert.repository
 
+import android.arch.lifecycle.LiveData
 import android.location.Location
 import com.github.pksokolowski.smogalert.airquality.AirQualityService
 import com.github.pksokolowski.smogalert.database.AirQualityLog
@@ -29,6 +30,10 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             return freshLog.assignId(logId)
         }
         return latestCachedLog
+    }
+
+    fun getCachedLog(): LiveData<AirQualityLog?>{
+        return airQualityLogsDao.getLatestCachedAirQualityLog()
     }
 
     private fun fetchFreshLog(timeStamp: Long): AirQualityLog {
