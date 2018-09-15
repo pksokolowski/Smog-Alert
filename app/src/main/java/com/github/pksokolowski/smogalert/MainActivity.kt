@@ -5,8 +5,9 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.SeekBar
+import com.github.pksokolowski.smogalert.job.AirCheckParams.Companion.INDEX_LEVEL_UNREACHABLE
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
-import com.github.pksokolowski.smogalert.notifications.NotificationHelper
 import com.github.pksokolowski.smogalert.utils.TimeHelper
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
@@ -44,12 +45,25 @@ class MainActivity : AppCompatActivity() {
             viewModel.checkCurrentAirQuality()
         }
 
-        enable_alarms_button.setOnClickListener{
-            viewModel.setAirCheckEnabled(true)
-        }
+        viewModel.getWarningIndexLevel().observe(this, Observer {
+            val minimumWarningIndexLevel = it ?: INDEX_LEVEL_UNREACHABLE
+            val translatedValue = if (minimumWarningIndexLevel == INDEX_LEVEL_UNREACHABLE) 0
+            else 5 - minimumWarningIndexLevel
 
-        disable_alarms_button.setOnClickListener {
-            viewModel.setAirCheckEnabled(false)
-        }
+            setting_seek_bar.progress = translatedValue
+        })
+
+        setting_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, value: Int, fromUser: Boolean) {
+                if (!fromUser) return
+                // translate UI chosen value to an airQualityIndex warning threshold
+                val warningLevel = if (value == 0) INDEX_LEVEL_UNREACHABLE else 5 - value
+
+                viewModel.setMinimumWarningIndexLevel(warningLevel)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
     }
 }

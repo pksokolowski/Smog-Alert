@@ -29,7 +29,9 @@ class AirQualityCheckJobService : JobService() {
         return false
     }
 
-    override fun onStartJob(jobParams: JobParameters?): Boolean {
+    override fun onStartJob(jobParams: JobParameters): Boolean {
+        val checkParams = AirCheckParams(jobParams.extras)
+
         class AirQualityCheckerTask(private val airQualityLogsRepository: AirQualityLogsRepository,
                                     private val notificationHelper: NotificationHelper)
             : AsyncTask<Void, Void, AirQualityLog>() {
@@ -40,7 +42,9 @@ class AirQualityCheckJobService : JobService() {
 
             override fun onPostExecute(result: AirQualityLog) {
                 super.onPostExecute(result)
-                notificationHelper.showAlert(result)
+                if (result.airQualityIndex >= checkParams.minimumWarningIndexLevel) {
+                    notificationHelper.showAlert(result)
+                }
                 jobFinished(jobParams, false)
             }
         }

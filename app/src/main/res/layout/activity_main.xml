@@ -32,27 +32,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/enable_alarms_button"
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/setting_seek_bar"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="schedule updates"
-        app:layout_constraintEnd_toStartOf="@+id/disable_alarms_button"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/disable_alarms_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:text="unschedule updates"
+        android:max="4"
+        android:thumb="@android:drawable/ic_menu_mylocation"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/a_button" />
 
 </android.support.constraint.ConstraintLayout>

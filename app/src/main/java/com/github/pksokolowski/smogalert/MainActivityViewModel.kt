@@ -7,28 +7,32 @@ import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import android.widget.Toast
 import com.github.pksokolowski.smogalert.database.AirQualityLog
+import com.github.pksokolowski.smogalert.job.AirCheckParams
+import com.github.pksokolowski.smogalert.job.AirCheckParams.Companion.INDEX_LEVEL_UNREACHABLE
 import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(private val context: Application, private val airQualityLogsRepository: AirQualityLogsRepository, private val jobsHelper: JobsHelper) : ViewModel() {
     private val airQualityInfo = MutableLiveData<AirQualityLog>()
+    private val minimumWarningIndexLevel = MutableLiveData<Int>()
+            .apply { value = jobsHelper.getAirCheckParams().minimumWarningIndexLevel}
 
-    fun getAirQualityInfo(): LiveData<AirQualityLog> {
-        return airQualityInfo
-    }
+    fun getAirQualityInfo() = airQualityInfo as LiveData<AirQualityLog>
+    fun getWarningIndexLevel() = minimumWarningIndexLevel as LiveData<Int>
 
     fun checkCurrentAirQuality() {
         val task = AirQualityDataFetcher(airQualityLogsRepository, airQualityInfo)
         task.execute()
     }
 
-    fun setAirCheckEnabled(enabled: Boolean) {
-        if (enabled)
-            if(!jobsHelper.scheduleAirQualityCheckJob()){
+    fun setMinimumWarningIndexLevel(warningLevel: Int) {
+        if (warningLevel != INDEX_LEVEL_UNREACHABLE) {
+            val params = AirCheckParams(warningLevel)
+            if (!jobsHelper.scheduleAirQualityCheckJob(params)) {
                 Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
             }
-        else
+        } else
             jobsHelper.unScheduleAirQualityCheckJob()
     }
 
