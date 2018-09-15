@@ -13,25 +13,26 @@ import javax.inject.Inject
 class JobsHelper @Inject constructor(private val context: Application) {
     private val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
-    fun scheduleAirQualityCheckJob(AirCheckParams: AirCheckParams): Boolean {
+    fun scheduleAirQualityCheckJob(airCheckParams: AirCheckParams): Boolean {
+        if (airCheckParams.sensitivity == 0) {
+            jobScheduler.cancel(JOB_ID)
+            return true
+        }
+
         val jobInfo = JobInfo.Builder(JOB_ID, ComponentName(context, AirQualityCheckJobService::class.java))
                 .setPeriodic(PERIOD, FLEX)
                 .setPersisted(true)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setExtras(AirCheckParams.getExtras())
+                .setExtras(airCheckParams.getExtras())
                 .build()
 
         val result = jobScheduler.schedule(jobInfo)
         return result == RESULT_SUCCESS
     }
 
-    fun unScheduleAirQualityCheckJob() {
-        jobScheduler.cancel(JOB_ID)
-    }
-
     fun getAirCheckParams(): AirCheckParams {
         val job = jobScheduler.getPendingJob(JOB_ID)
-                ?: return AirCheckParams(AirCheckParams.INDEX_LEVEL_UNREACHABLE)
+                ?: return AirCheckParams(0)
 
         return AirCheckParams(job.extras)
     }

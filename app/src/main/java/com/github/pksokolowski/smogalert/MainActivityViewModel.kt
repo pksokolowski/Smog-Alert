@@ -8,32 +8,28 @@ import android.os.AsyncTask
 import android.widget.Toast
 import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.job.AirCheckParams
-import com.github.pksokolowski.smogalert.job.AirCheckParams.Companion.INDEX_LEVEL_UNREACHABLE
 import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(private val context: Application, private val airQualityLogsRepository: AirQualityLogsRepository, private val jobsHelper: JobsHelper) : ViewModel() {
     private val airQualityInfo = MutableLiveData<AirQualityLog>()
-    private val minimumWarningIndexLevel = MutableLiveData<Int>()
-            .apply { value = jobsHelper.getAirCheckParams().minimumWarningIndexLevel}
+    private val sensitivity = MutableLiveData<Int>()
+            .apply { value = jobsHelper.getAirCheckParams().sensitivity }
 
     fun getAirQualityInfo() = airQualityInfo as LiveData<AirQualityLog>
-    fun getWarningIndexLevel() = minimumWarningIndexLevel as LiveData<Int>
+    fun getSensitivity() = sensitivity as LiveData<Int>
 
     fun checkCurrentAirQuality() {
         val task = AirQualityDataFetcher(airQualityLogsRepository, airQualityInfo)
         task.execute()
     }
 
-    fun setMinimumWarningIndexLevel(warningLevel: Int) {
-        if (warningLevel != INDEX_LEVEL_UNREACHABLE) {
-            val params = AirCheckParams(warningLevel)
-            if (!jobsHelper.scheduleAirQualityCheckJob(params)) {
-                Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
-            }
-        } else
-            jobsHelper.unScheduleAirQualityCheckJob()
+    fun setMinimumWarningIndexLevel(sensitivity: Int) {
+        val params = AirCheckParams(sensitivity)
+        if (!jobsHelper.scheduleAirQualityCheckJob(params)) {
+            Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
+        }
     }
 
     private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository, private val outputLiveData: MutableLiveData<AirQualityLog>) : AsyncTask<Void, Void, AirQualityLog>() {

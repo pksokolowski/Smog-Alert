@@ -42,7 +42,7 @@ class AirQualityCheckJobService : JobService() {
 
             override fun onPostExecute(result: AirQualityLog) {
                 super.onPostExecute(result)
-                if (result.airQualityIndex >= checkParams.minimumWarningIndexLevel) {
+                if (result.airQualityIndex >= checkParams.getMinimumWarningIndexLevel()) {
                     notificationHelper.showAlert(result)
                 }
                 jobFinished(jobParams, false)
