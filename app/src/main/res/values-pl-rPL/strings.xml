@@ -10,15 +10,31 @@
     <string name="error_explanation_connection">Błąd połączenia internetowego</string>
     <string name="error_explanation_unknown">Nieznany błąd</string>
     <string name="air_quality_header">Jakość powietrza</string>
-
+    <string name="sensitivity_setting_title">Poziom ostrzegania:</string>
 
     <array name="index_level_titles">
-        <item>Bardzo dobry</item>
-        <item>Dobry</item>
-        <item>Umiarkowany</item>
-        <item>Dostateczny</item>
-        <item>Zły</item>
-        <item>Bardzo zły</item>
+        <item>Bardzo dobra</item>
+        <item>Dobra</item>
+        <item>Umiarkowana</item>
+        <item>Dostateczna</item>
+        <item>Zła</item>
+        <item>Bardzo zła</item>
         <item>Brak danych</item>
+    </array>
+
+    <array name="sensitivity_level_titles">
+        <item>Wyłączony</item>
+        <item>Zły</item>
+        <item>Dostateczny</item>
+        <item>Umiarkowany</item>
+        <item>Nieznany</item>
+    </array>
+
+    <array name="sensitivity_level_descriptions">
+        <item>Ostrzeganie o smogu jest wyłączone. Przesuń suwak poniżej aby uruchomić ostrzeganie.</item>
+        <item>Zaleca się unikanie przebywania na powietrzu, w szczególności odradza się podejmowania tam aktywności fizycznej.</item>
+        <item>Zaleca się rozważenie ograniczenia czasu spędzonego na powietrzu, zwłaszcza jeżeli w grę wchodzi aktywność fizyczna.</item>
+        <item>Jakość powietrza jest akceptowalna, nie ma jednoznacznych zaleceń w sprawie przebywania na zewnątrz, nawet w ramach aktywności fizycznej. Niemniej zwraca się uwagę, że nadal może to być szkodliwe dla zdrowia.</item>
+        <item>Nieznany</item>
     </array>
 </resources>

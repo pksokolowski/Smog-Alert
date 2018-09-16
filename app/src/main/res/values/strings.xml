@@ -9,6 +9,7 @@
     <string name="error_explanation_connection">Connection failure</string>
     <string name="error_explanation_unknown">Unknown error</string>
     <string name="air_quality_header">Air Quality</string>
+    <string name="sensitivity_setting_title">Warning Level:</string>
 
     <array name="index_level_titles">
         <item>Very good</item>
@@ -17,6 +18,22 @@
         <item>Sufficient</item>
         <item>Bad</item>
         <item>Very bad</item>
+        <item>Unknown</item>
+    </array>
+
+    <array name="sensitivity_level_titles">
+        <item>Turned off</item>
+        <item>Bad</item>
+        <item>Sufficient</item>
+        <item>Moderate</item>
+        <item>Unknown</item>
+    </array>
+
+    <array name="sensitivity_level_descriptions">
+        <item>Smog notifications are currently turned off. Use the slider below to change the setting.</item>
+        <item>It is recommended to spend as little time outside as possible and to especially avoid any and all physical activity while outdoors.</item>
+        <item>It is recommended to consider reducing time spent outdoors, especially if physical activity is involved.</item>
+        <item>Air quality is acceptable. There are no clear recommendations to avoid staying outside or performing physical activity there. However it is mentioned that it can possibly still lead to adverse health outcomes.</item>
         <item>Unknown</item>
     </array>
 </resources>

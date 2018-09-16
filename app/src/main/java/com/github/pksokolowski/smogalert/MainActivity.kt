@@ -10,6 +10,7 @@ import android.widget.SeekBar
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
 import com.github.pksokolowski.smogalert.utils.AirQualityIndexHelper
 import com.github.pksokolowski.smogalert.utils.ErrorExplanationHelper
+import com.github.pksokolowski.smogalert.utils.SensitivityLevelsHelper
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -52,13 +53,17 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.getSensitivity().observe(this, Observer {
-            setting_seek_bar.progress = it ?: 0
+            val sensitivity = it ?: 0
+            setting_seek_bar.progress = sensitivity
+            warningLevelTitle.text = SensitivityLevelsHelper.getTitle(sensitivity, this)
+            warningLevelTitle.setTextColor(SensitivityLevelsHelper.getColor(sensitivity, this))
+            warningLevelDescription.text = SensitivityLevelsHelper.explain(sensitivity, this)
         })
 
         setting_seek_bar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, value: Int, fromUser: Boolean) {
                 if (!fromUser) return
-                viewModel.setMinimumWarningIndexLevel(value)
+                viewModel.setSensitivity(value)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}

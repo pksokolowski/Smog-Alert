@@ -34,11 +34,12 @@ class MainActivityViewModel @Inject constructor(private val context: Application
         task.execute()
     }
 
-    fun setMinimumWarningIndexLevel(sensitivity: Int) {
+    fun setSensitivity(sensitivity: Int) {
         val params = AirCheckParams(sensitivity)
         if (!jobsHelper.scheduleAirQualityCheckJob(params)) {
             Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
         }
+        this.sensitivity.value = sensitivity
     }
 
     private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository,
