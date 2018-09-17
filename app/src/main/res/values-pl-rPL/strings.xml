@@ -3,6 +3,17 @@
     <string name="app_name">Obserwator Smogu</string>
     <string name="notification_channel_alerts_title">Ostrzeżenia o smogu</string>
     <string name="notification_channel_alerts_description">Powiadomienia o wysokich stężeniach szkodliwych substancji w powietrzu.</string>
+    <string name="notification_channel_improvement_title">Poprawa jakości powietrza</string>
+    <string name="notification_channel_improvement_description">Notyfikacje pojawiające się wówczas, gdy poziom smogu spadnie poniżej ustawionego poziomu ostrzegania.</string>
+    <string name="notification_channel_errors_title">Errors</string>
+    <string name="notification_channel_errors_description">Te notyfikacje pojawiają się, gdy pobranie danych jest niemożliwe. Np. gdy wyłączona jest Lokalizacja.</string>
+    <string name="notification_channel_data_shortage_title">Brak danych</string>
+    <string name="notification_channel_data_shortage_description">Te powiadomienia pojawiają się, gdy połączenie z serverem zostanie osiągnięte, ale nie ma on nowych danych, zwykle wskutek awarii.</string>
+    <string name="notification_alerts_message">Jakość powietrza spadła poniżej wybranego poziomu</string>
+    <string name="notification_improvement_message">Jakość powietrza poprawiła się</string>
+    <string name="notification_data_shortage_message">Brak danych o jakości powietrza</string>
+    <string name="notification_error_message">Wystąpił błąd. Dotknij aby otworzyć aplikację</string>
+
     <string name="error_explanation_server">Brak danych na serverze</string>
     <string name="error_explanation_location">Lokalizacja niedostępna</string>
     <string name="error_explanation_stations_missing">Brak danych o stacjach</string>

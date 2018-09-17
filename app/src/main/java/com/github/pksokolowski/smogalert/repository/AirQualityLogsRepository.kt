@@ -32,7 +32,12 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         return latestCachedLog
     }
 
-    fun getCachedLog(): LiveData<AirQualityLog?>{
+    fun getNLatestLogs(n: Int): List<AirQualityLog> {
+        getLatestLog()
+        return airQualityLogsDao.getNLatestLogs(n)
+    }
+
+    fun getCachedLog(): LiveData<AirQualityLog?> {
         return airQualityLogsDao.getLatestCachedAirQualityLog()
     }
 
@@ -44,18 +49,19 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         val stationId = getNearestStationID(location)
                 ?: return AirQualityLog(errorCode = ERROR_CODE_STATION_MISSING,
                         timeStamp = timeStamp)
-        if(stationId == -1L){
+        if (stationId == -1L) {
             return AirQualityLog(errorCode = ERROR_CODE_STATIONS_TOO_FAR_AWAY,
                     timeStamp = timeStamp)
         }
 
         val call = airQualityService.getCurrentAQ(stationId)
-        val apiResponse = try {call.execute().body()
-                ?: return AirQualityLog(stationId = stationId,
-                        errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
-                        timeStamp = timeStamp)
-        } catch (e: Exception){
-            return  AirQualityLog(stationId = stationId,
+        val apiResponse = try {
+            call.execute().body()
+                    ?: return AirQualityLog(stationId = stationId,
+                            errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
+                            timeStamp = timeStamp)
+        } catch (e: Exception) {
+            return AirQualityLog(stationId = stationId,
                     errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
                     timeStamp = timeStamp)
         }

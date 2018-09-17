@@ -10,6 +10,8 @@ import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.di.PerApp
 import javax.inject.Inject
 import android.app.PendingIntent
+import android.graphics.Color
+import android.media.RingtoneManager
 import com.github.pksokolowski.smogalert.MainActivity
 import com.github.pksokolowski.smogalert.utils.TimeHelper
 
@@ -21,13 +23,57 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         createNotificationChannels()
     }
 
-    fun showAlert(airQualityLog: AirQualityLog) {
-        val message = "id: ${airQualityLog.id}, AQ: ${airQualityLog.airQualityIndex}, stationId: ${airQualityLog.stationId}, err: ${airQualityLog.errorCode}, time: ${TimeHelper.getTimeStampString(airQualityLog.timeStamp)}"
-
+    fun showAlert() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_ALERTS)
-                .setContentText(message)
+                .setContentText(context.getString(R.string.notification_alerts_message))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(Color.RED)
+                .setContentIntent(getOpenMainActivityPendingIntent(context))
+
+        val notification = b.build()
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+    }
+
+    fun showImprovement(){
+        val b = NotificationCompat.Builder(context, CHANNEL_ID_IMPROVEMENT)
+                .setContentText(context.getString(R.string.notification_improvement_message))
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_warning_white_24dp)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(Color.GREEN)
+                .setContentIntent(getOpenMainActivityPendingIntent(context))
+
+        val notification = b.build()
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+    }
+
+    fun showDataShortage(){
+        val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
+                .setContentText(context.getString(R.string.notification_data_shortage_message))
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_warning_white_24dp)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(Color.YELLOW)
+
+        val notification = b.build()
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+    }
+
+    fun showError(){
+        val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
+                .setContentText(context.getString(R.string.notification_error_message))
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_warning_white_24dp)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(Color.YELLOW)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
 
         val notification = b.build()
@@ -44,20 +90,51 @@ class NotificationHelper @Inject constructor(private val context: Application) {
 
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = context.getString(R.string.notification_channel_alerts_title)
-            val description = context.getString(R.string.notification_channel_alerts_description)
 
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID_ALERTS, name, importance)
-            channel.description = description
+            val alertsChannel = NotificationChannel(CHANNEL_ID_ALERTS,
+                    context.getString(R.string.notification_channel_alerts_title),
+                    NotificationManager.IMPORTANCE_HIGH).apply {
+                description = context.getString(R.string.notification_channel_alerts_description)
+                lightColor = Color.RED
+            }
 
-            val notificationManager = context.getSystemService(NotificationManager::class.java)
-            notificationManager!!.createNotificationChannel(channel)
+            val improvementChannel = NotificationChannel(CHANNEL_ID_IMPROVEMENT,
+                    context.getString(R.string.notification_channel_improvement_title),
+                    NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.notification_channel_improvement_description)
+                lightColor = Color.GREEN
+            }
+
+            val errorsChannel = NotificationChannel(CHANNEL_ID_ERRORS,
+                    context.getString(R.string.notification_channel_errors_title),
+                    NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.notification_channel_errors_description)
+                lightColor = Color.YELLOW
+            }
+
+            val dataShortageChannel = NotificationChannel(CHANNEL_ID_DATA_SHORTAGE,
+                    context.getString(R.string.notification_channel_data_shortage_title),
+                    NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = context.getString(R.string.notification_channel_data_shortage_description)
+                lightColor = Color.YELLOW
+            }
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(alertsChannel)
+            notificationManager.createNotificationChannel(improvementChannel)
+            notificationManager.createNotificationChannel(errorsChannel)
+            notificationManager.createNotificationChannel(dataShortageChannel)
         }
+
     }
 
     companion object {
         const val CHANNEL_ID_ALERTS = "alerts"
+        const val CHANNEL_ID_IMPROVEMENT = "improvement"
+        const val CHANNEL_ID_ERRORS = "errors"
+        const val CHANNEL_ID_DATA_SHORTAGE = "data_shortage"
+
         const val NOTIFICATION_ID_ALERT = 0
+        const val NOTIFICATION_ID_MESSAGE = 1
     }
 }
