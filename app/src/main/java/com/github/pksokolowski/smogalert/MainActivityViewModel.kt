@@ -40,6 +40,7 @@ class MainActivityViewModel @Inject constructor(private val context: Application
             Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
         }
         this.sensitivity.value = sensitivity
+        checkCurrentAirQuality()
     }
 
     private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository,
