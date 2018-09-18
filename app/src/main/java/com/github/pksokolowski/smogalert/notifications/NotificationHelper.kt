@@ -6,14 +6,12 @@ import android.content.Intent
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import com.github.pksokolowski.smogalert.R
-import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.di.PerApp
 import javax.inject.Inject
 import android.app.PendingIntent
 import android.graphics.Color
 import android.media.RingtoneManager
 import com.github.pksokolowski.smogalert.MainActivity
-import com.github.pksokolowski.smogalert.utils.TimeHelper
 
 
 @PerApp
@@ -35,7 +33,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+        notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
     fun showImprovement(){
@@ -50,7 +48,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+        notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
     fun showDataShortage(){
@@ -64,7 +62,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+        notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
     fun showError(){
@@ -79,7 +77,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        notificationManager.notify(NOTIFICATION_ID_ALERT, notification)
+        notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
     private fun getOpenMainActivityPendingIntent(context: Context): PendingIntent {
@@ -134,7 +132,6 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         const val CHANNEL_ID_ERRORS = "errors"
         const val CHANNEL_ID_DATA_SHORTAGE = "data_shortage"
 
-        const val NOTIFICATION_ID_ALERT = 0
-        const val NOTIFICATION_ID_MESSAGE = 1
+        const val NOTIFICATIONS_ID = 0
     }
 }
