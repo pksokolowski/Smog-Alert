@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Obserwator Smogu</string>
+    <string name="app_name">Smog Light</string>
     <string name="notification_channel_alerts_title">Ostrzeżenia o smogu</string>
     <string name="notification_channel_alerts_description">Powiadomienia o wysokich stężeniach szkodliwych substancji w powietrzu.</string>
     <string name="notification_channel_improvement_title">Poprawa jakości powietrza</string>
-    <string name="notification_channel_improvement_description">Notyfikacje pojawiające się wówczas, gdy poziom smogu spadnie poniżej ustawionego poziomu ostrzegania.</string>
-    <string name="notification_channel_errors_title">Errors</string>
-    <string name="notification_channel_errors_description">Te notyfikacje pojawiają się, gdy pobranie danych jest niemożliwe. Np. gdy wyłączona jest Lokalizacja.</string>
-    <string name="notification_channel_data_shortage_title">Brak danych</string>
-    <string name="notification_channel_data_shortage_description">Te powiadomienia pojawiają się, gdy połączenie z serverem zostanie osiągnięte, ale nie ma on nowych danych, zwykle wskutek awarii.</string>
-    <string name="notification_alerts_message">Jakość powietrza spadła poniżej wybranego poziomu</string>
+    <string name="notification_channel_improvement_description">Powiadomienia pojawiające się wówczas, gdy poziom smogu spadnie poniżej ustawionego poziomu ostrzegania.</string>
+    <string name="notification_channel_errors_title">Błędy</string>
+    <string name="notification_channel_errors_description">Te powiadomienia pojawiają się, gdy pobranie danych jest niemożliwe. Np. gdy wyłączona jest Lokalizacja.</string>
+    <string name="notification_channel_data_shortage_title">Braki danych</string>
+    <string name="notification_channel_data_shortage_description">Te powiadomienia pojawiają się, gdy połączenie z serwerem zostanie osiągnięte, ale nie ma on nowych danych, zwykle wskutek awarii.</string>
+    <string name="notification_alerts_message">Jakość powietrza pogorszyła się</string>
     <string name="notification_improvement_message">Jakość powietrza poprawiła się</string>
     <string name="notification_data_shortage_message">Brak danych o jakości powietrza</string>
     <string name="notification_error_message">Wystąpił błąd. Dotknij aby otworzyć aplikację</string>
@@ -34,11 +34,11 @@
     </array>
 
     <array name="sensitivity_level_titles">
-        <item>Wyłączony</item>
+        <item>Wyłączone</item>
         <item>Zły</item>
         <item>Dostateczny</item>
         <item>Umiarkowany</item>
-        <item>Nieznany</item>
+        <item>błąd</item>
     </array>
 
     <array name="sensitivity_level_descriptions">
@@ -46,6 +46,6 @@
         <item>Zaleca się unikanie przebywania na powietrzu, w szczególności odradza się podejmowania tam aktywności fizycznej.</item>
         <item>Zaleca się rozważenie ograniczenia czasu spędzonego na powietrzu, zwłaszcza jeżeli w grę wchodzi aktywność fizyczna.</item>
         <item>Jakość powietrza jest akceptowalna, nie ma jednoznacznych zaleceń w sprawie przebywania na zewnątrz, nawet w ramach aktywności fizycznej. Niemniej zwraca się uwagę, że nadal może to być szkodliwe dla zdrowia.</item>
-        <item>Nieznany</item>
+        <item>błąd</item>
     </array>
 </resources>

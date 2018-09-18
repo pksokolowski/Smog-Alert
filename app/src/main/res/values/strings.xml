@@ -1,22 +1,22 @@
 <resources>
-    <string name="app_name">Smog Alert</string>
+    <string name="app_name">Smog Light</string>
     <string name="notification_channel_alerts_title">Smog alerts</string>
     <string name="notification_channel_alerts_description">Notifications letting you know about poor air quality.</string>
     <string name="notification_channel_improvement_title">Air quality improvement</string>
     <string name="notification_channel_improvement_description">Notifications letting you know that air quality is good again.</string>
     <string name="notification_channel_errors_title">Errors</string>
-    <string name="notification_channel_errors_description">These notifications appear when the app is unable to download the right data. For example when Location is turned off or there are no measurement stations in the vicinity..</string>
-    <string name="notification_channel_data_shortage_title">Data shortage</string>
-    <string name="notification_channel_data_shortage_description">Notifications in this channel appear when server is contacted correctly, but there are no air quality measurements available, like when there are technical difficulties.</string>
-    <string name="notification_alerts_message">Air quality degraded past your warning level</string>
-    <string name="notification_improvement_message">Air quality improved past your warning level</string>
+    <string name="notification_channel_errors_description">These notifications appear when the app is unable to download the right data. For example when Location is turned off or there are no measurement stations in the vicinity.</string>
+    <string name="notification_channel_data_shortage_title">Data shortages</string>
+    <string name="notification_channel_data_shortage_description">These notifications appear when server is contacted correctly, but there are no air quality measurements available, like when there are technical difficulties.</string>
+    <string name="notification_alerts_message">Air quality has declined</string>
+    <string name="notification_improvement_message">Air quality has improved</string>
     <string name="notification_data_shortage_message">Air quality is unknown</string>
     <string name="notification_error_message">An error occurred. Tap here to open the app</string>
 
     <string name="error_explanation_server">Server didn\'t have the data</string>
     <string name="error_explanation_location">Location wasn\'t available</string>
     <string name="error_explanation_stations_missing">Stations data were missing</string>
-    <string name="error_explanation_stations_far_away">No station within 10km radius</string>
+    <string name="error_explanation_stations_far_away">No stations within 10km radius</string>
     <string name="error_explanation_connection">Connection failure</string>
     <string name="error_explanation_unknown">Unknown error</string>
     <string name="air_quality_header">Air Quality</string>
@@ -37,14 +37,14 @@
         <item>Bad</item>
         <item>Sufficient</item>
         <item>Moderate</item>
-        <item>Unknown</item>
+        <item>error</item>
     </array>
 
     <array name="sensitivity_level_descriptions">
         <item>Smog notifications are currently turned off. Use the slider below to change the setting.</item>
-        <item>It is recommended to spend as little time outside as possible and to especially avoid any and all physical activity while outdoors.</item>
+        <item>It is recommended to spend as little time outside as possible and to especially avoid engaging in outdoors physical activity.</item>
         <item>It is recommended to consider reducing time spent outdoors, especially if physical activity is involved.</item>
         <item>Air quality is acceptable. There are no clear recommendations to avoid staying outside or performing physical activity there. However it is mentioned that it can possibly still lead to adverse health outcomes.</item>
-        <item>Unknown</item>
+        <item>error</item>
     </array>
 </resources>
