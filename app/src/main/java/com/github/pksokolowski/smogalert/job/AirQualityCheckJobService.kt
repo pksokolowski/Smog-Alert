@@ -70,7 +70,7 @@ class AirQualityCheckJobService : JobService() {
         }
         task = AirQualityCheckerTask(airQualityLogsRepository, notificationHelper)
 
-        task?.execute()
+        task?.execute() ?: return true
         return false
     }
 
