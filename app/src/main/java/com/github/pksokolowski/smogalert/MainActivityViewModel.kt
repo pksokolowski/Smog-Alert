@@ -6,11 +6,11 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import android.widget.Toast
-import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
+import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(private val context: Application,
@@ -30,7 +30,7 @@ class MainActivityViewModel @Inject constructor(private val context: Application
     fun checkCurrentAirQuality() {
         if (!locationAvailabilityHelper.checkOverallAvailability()) return
 
-        val task = AirQualityDataFetcher(airQualityLogsRepository, isDownloadInProgress)
+        val task = AirQualityDataFetcher(airQualityLogsRepository, jobsHelper, isDownloadInProgress)
         task.execute()
     }
 
@@ -44,19 +44,21 @@ class MainActivityViewModel @Inject constructor(private val context: Application
     }
 
     private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository,
-                                        private val isDownloadInProgress: MutableLiveData<Boolean>) : AsyncTask<Void, Void, AirQualityLog>() {
+                                        private val jobsHelper: JobsHelper,
+                                        private val isDownloadInProgress: MutableLiveData<Boolean>) : AsyncTask<Void, Void, LogData>() {
 
         override fun onPreExecute() {
             super.onPreExecute()
             isDownloadInProgress.value = true
         }
 
-        override fun doInBackground(vararg params: Void?): AirQualityLog {
-            return repo.getLatestLog()
+        override fun doInBackground(vararg params: Void?): LogData {
+            return repo.getLatestLogData()
         }
 
-        override fun onPostExecute(result: AirQualityLog) {
+        override fun onPostExecute(result: LogData) {
             super.onPostExecute(result)
+            if (!result.isFromCache) jobsHelper.reschedule()
             isDownloadInProgress.value = false
         }
     }

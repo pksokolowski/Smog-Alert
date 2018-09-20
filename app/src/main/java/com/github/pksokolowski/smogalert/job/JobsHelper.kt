@@ -37,6 +37,12 @@ class JobsHelper @Inject constructor(private val context: Application) {
         return AirCheckParams(job.extras)
     }
 
+    fun reschedule() {
+        val params = getAirCheckParams()
+        if (params.sensitivity == 0) return
+        scheduleAirQualityCheckJob(params)
+    }
+
     private companion object {
         const val JOB_ID = 0
 

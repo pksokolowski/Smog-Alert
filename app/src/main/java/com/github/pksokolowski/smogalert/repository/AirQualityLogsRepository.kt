@@ -21,20 +21,24 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                                                    private val stationsRepository: StationsRepository,
                                                    private val locationHelper: LocationHelper) {
 
-    fun getLatestLog(): AirQualityLog {
+    class LogData(val log: AirQualityLog, val isFromCache: Boolean)
+
+    fun getLatestLogData(): LogData {
         val timeNow = Calendar.getInstance().timeInMillis
         val latestCachedLog = airQualityLogsDao.getLatestAirQualityLog()
         if (latestCachedLog == null || latestCachedLog.timeStamp < timeNow - ACCEPTABLE_LOG_AGE) {
             val freshLog = fetchFreshLog(timeNow)
             val logId = airQualityLogsDao.insertAirQualityLog(freshLog)
-            return freshLog.assignId(logId)
+            return LogData(freshLog.assignId(logId), false)
         }
-        return latestCachedLog
+        return LogData(latestCachedLog, true)
     }
 
-    fun getNLatestLogs(n: Int): List<AirQualityLog> {
-        getLatestLog()
-        return airQualityLogsDao.getNLatestLogs(n)
+    class LogsData(val logs: List<AirQualityLog>, val isLatestFromCache: Boolean)
+
+    fun getNLatestLogs(n: Int): LogsData {
+        val isLatestFromCache = getLatestLogData().isFromCache
+        return LogsData(airQualityLogsDao.getNLatestLogs(n), isLatestFromCache)
     }
 
     fun getCachedLog(): LiveData<AirQualityLog?> {
