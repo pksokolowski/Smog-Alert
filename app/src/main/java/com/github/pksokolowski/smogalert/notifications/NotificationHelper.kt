@@ -29,6 +29,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.RED)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
+                .setAutoCancel(true)
 
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -44,6 +45,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.GREEN)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
+                .setAutoCancel(true)
 
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -58,6 +60,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
+                .setAutoCancel(true)
 
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -73,6 +76,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
+                .setAutoCancel(true)
 
         val notification = b.build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
