@@ -28,6 +28,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.RED)
+                .setLights(Color.RED, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
                 .setAutoCancel(true)
 
@@ -37,13 +38,14 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
-    fun showImprovement(){
+    fun showImprovement() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_IMPROVEMENT)
                 .setContentText(context.getString(R.string.notification_improvement_message))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.GREEN)
+                .setLights(Color.GREEN, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
                 .setAutoCancel(true)
 
@@ -53,13 +55,14 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
-    fun showDataShortage(){
+    fun showDataShortage() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
                 .setContentText(context.getString(R.string.notification_data_shortage_message))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
+                .setLights(Color.YELLOW, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
                 .setAutoCancel(true)
 
         val notification = b.build()
@@ -68,13 +71,14 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
-    fun showError(){
+    fun showError() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
                 .setContentText(context.getString(R.string.notification_error_message))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
+                .setLights(Color.YELLOW, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
                 .setAutoCancel(true)
 
@@ -97,6 +101,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                     context.getString(R.string.notification_channel_alerts_title),
                     NotificationManager.IMPORTANCE_HIGH).apply {
                 description = context.getString(R.string.notification_channel_alerts_description)
+                enableLights(true)
                 lightColor = Color.RED
             }
 
@@ -104,6 +109,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                     context.getString(R.string.notification_channel_improvement_title),
                     NotificationManager.IMPORTANCE_DEFAULT).apply {
                 description = context.getString(R.string.notification_channel_improvement_description)
+                enableLights(true)
                 lightColor = Color.GREEN
             }
 
@@ -111,6 +117,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                     context.getString(R.string.notification_channel_errors_title),
                     NotificationManager.IMPORTANCE_DEFAULT).apply {
                 description = context.getString(R.string.notification_channel_errors_description)
+                enableLights(true)
                 lightColor = Color.YELLOW
             }
 
@@ -118,14 +125,16 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                     context.getString(R.string.notification_channel_data_shortage_title),
                     NotificationManager.IMPORTANCE_DEFAULT).apply {
                 description = context.getString(R.string.notification_channel_data_shortage_description)
+                enableLights(true)
                 lightColor = Color.YELLOW
             }
 
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(alertsChannel)
-            notificationManager.createNotificationChannel(improvementChannel)
-            notificationManager.createNotificationChannel(errorsChannel)
-            notificationManager.createNotificationChannel(dataShortageChannel)
+            notificationManager.createNotificationChannels(listOf(
+                    alertsChannel,
+                    improvementChannel,
+                    errorsChannel,
+                    dataShortageChannel))
         }
 
     }
@@ -137,5 +146,8 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         const val CHANNEL_ID_DATA_SHORTAGE = "data_shortage"
 
         const val NOTIFICATIONS_ID = 0
+
+        const val LIGHTS_ON_TIME = 1000
+        const val LIGHT_OFF_TIME = 600
     }
 }
