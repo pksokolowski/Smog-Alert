@@ -98,7 +98,7 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
         const val FAILURE = 1
         private const val DAY_IN_MILLIS = 86400000L
         const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE = 3 * DAY_IN_MILLIS
-        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE = 30 * 60000L
+        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE = 30 * 60000L - 1
         const val CACHE_UPDATE_INTERVAL_AFTER_SUCCESS = 30 * DAY_IN_MILLIS
     }
 

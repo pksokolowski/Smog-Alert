@@ -35,18 +35,51 @@ data class AirQualityLog(
         val errorCode: Int = 0,
 
         @ColumnInfo(name = "time_stamp")
-        val timeStamp: Long
+        val timeStamp: Long,
+
+        @ColumnInfo(name = "metadata")
+        val metadata: Int = 0
 
 ) {
     fun assignId(id: Long) =
-            AirQualityLog(id, airQualityIndex, stationId, errorCode, timeStamp)
+            AirQualityLog(id, airQualityIndex, stationId, errorCode, timeStamp, metadata)
+
+    fun hasSensor(sensorFlag: Int) = metadata and sensorFlag != 0
+
+    fun getSensorCount(): Int {
+        var count = 0
+        for (i in SENSORS.indices) {
+            if (hasSensor(SENSORS[i])) count += 1
+        }
+        return count
+    }
+
+    fun hasParticulateMatterData() = hasSensor(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
 
     companion object {
         const val ERROR_CODE_SUCCESS = 0
         const val ERROR_CODE_LOCATION_MISSING = 1
-        const val ERROR_CODE_STATION_MISSING = 2
+        const val ERROR_CODE_NO_KNOWN_STATIONS = 2
         const val ERROR_CODE_STATIONS_TOO_FAR_AWAY = 3
         const val ERROR_CODE_AIR_QUALITY_MISSING = 4
+
+        const val FLAG_SENSOR_PM10 = 1
+        const val FLAG_SENSOR_PM25 = 2
+        const val FLAG_SENSOR_O3 = 4
+        const val FLAG_SENSOR_NO2 = 8
+        const val FLAG_SENSOR_SO2 = 16
+        const val FLAG_SENSOR_C6H6 = 32
+        const val FLAG_SENSOR_CO = 64
+
+        val SENSORS = listOf(
+                FLAG_SENSOR_PM10,
+                FLAG_SENSOR_PM25,
+                FLAG_SENSOR_O3,
+                FLAG_SENSOR_NO2,
+                FLAG_SENSOR_SO2,
+                FLAG_SENSOR_C6H6,
+                FLAG_SENSOR_CO
+        )
     }
 
 }

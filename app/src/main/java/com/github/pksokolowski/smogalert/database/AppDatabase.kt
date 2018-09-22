@@ -7,7 +7,7 @@ import android.arch.persistence.room.RoomDatabase
         entities = [
             AirQualityLog::class,
             Station::class],
-        version = 4,
+        version = 5,
         exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
