@@ -6,12 +6,17 @@ import com.github.pksokolowski.smogalert.airquality.AirQualityService
 import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_AIR_QUALITY_MISSING
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_LOCATION_MISSING
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_INTERNET
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_ALSO_CHECKED_BACKUP_STATION
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_CHOSEN_DATA_FROM_BACKUP_STATION
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_USED_API
 import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
 import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.location.LocationHelper
 import com.github.pksokolowski.smogalert.utils.AirQualityLogDataConverter
+import com.github.pksokolowski.smogalert.utils.InternetConnectionChecker
 import java.util.*
 import javax.inject.Inject
 
@@ -19,14 +24,16 @@ import javax.inject.Inject
 class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao: AirQualityLogsDao,
                                                    private val airQualityService: AirQualityService,
                                                    private val stationsRepository: StationsRepository,
-                                                   private val locationHelper: LocationHelper) {
+                                                   private val locationHelper: LocationHelper,
+                                                   private val connectionChecker: InternetConnectionChecker) {
 
     class LogData(val log: AirQualityLog, val isFromCache: Boolean)
-
     fun getLatestLogData(): LogData {
         val timeNow = Calendar.getInstance().timeInMillis
         val latestCachedLog = airQualityLogsDao.getLatestAirQualityLog()
-        if (latestCachedLog == null || latestCachedLog.timeStamp < timeNow - ACCEPTABLE_LOG_AGE) {
+        if (latestCachedLog == null
+                || latestCachedLog.timeStamp < timeNow - ACCEPTABLE_LOG_AGE
+                || !latestCachedLog.hasFlag(FLAG_USED_API)) {
             val freshLog = fetchFreshLog(timeNow)
             val logId = airQualityLogsDao.insertAirQualityLog(freshLog)
             return LogData(freshLog.assignId(logId), false)
@@ -35,7 +42,6 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     class LogsData(val logs: List<AirQualityLog>, val isLatestFromCache: Boolean)
-
     fun getNLatestLogs(n: Int): LogsData {
         val isLatestFromCache = getLatestLogData().isFromCache
         return LogsData(airQualityLogsDao.getNLatestLogs(n), isLatestFromCache)
@@ -46,6 +52,11 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     private fun fetchFreshLog(timeStamp: Long): AirQualityLog {
+        if(!connectionChecker.isConnectionAvailable()){
+            return AirQualityLog(errorCode = ERROR_CODE_NO_INTERNET,
+                    timeStamp = timeStamp)
+        }
+
         val location = locationHelper.getLastLocationData().location
                 ?: return AirQualityLog(errorCode = ERROR_CODE_LOCATION_MISSING,
                         timeStamp = timeStamp)
@@ -59,20 +70,24 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         }
 
         val nearest = getLogFromAPI(stations.first(), timeStamp)
+        var flags = FLAG_USED_API
 
         // check if the nearest station is fine, otherwise consider a further station
         if (stations.size > 1
                 && (!nearest.hasParticulateMatterData() || nearest.airQualityIndex == -1)) {
+            flags = flags or FLAG_ALSO_CHECKED_BACKUP_STATION
             // second API request
             val further = getLogFromAPI(stations[1], timeStamp)
 
             if (further.airQualityIndex != -1
                     && further.airQualityIndex > nearest.airQualityIndex
-                    && further.hasParticulateMatterData()
-            ) return further
+                    && further.hasParticulateMatterData()) {
+                flags = flags or FLAG_CHOSEN_DATA_FROM_BACKUP_STATION
+                return further.addFlags(flags)
+            }
         }
 
-        return nearest
+        return nearest.addFlags(flags)
     }
 
     private fun getLogFromAPI(stationId: Long, timeStamp: Long): AirQualityLog {

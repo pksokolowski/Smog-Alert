@@ -15,6 +15,7 @@
     <string name="notification_error_message">Wystąpił błąd. Dotknij aby otworzyć aplikację</string>
 
     <string name="error_explanation_server">Brak danych na serverze</string>
+    <string name="error_explanation_internet">Brak internetu</string>
     <string name="error_explanation_location">Lokalizacja niedostępna</string>
     <string name="error_explanation_stations_missing">Brak danych o stacjach</string>
     <string name="error_explanation_stations_far_away">Brak stacji w promieniu 10km</string>

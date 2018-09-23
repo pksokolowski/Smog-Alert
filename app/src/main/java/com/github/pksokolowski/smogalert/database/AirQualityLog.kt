@@ -44,24 +44,28 @@ data class AirQualityLog(
     fun assignId(id: Long) =
             AirQualityLog(id, airQualityIndex, stationId, errorCode, timeStamp, metadata)
 
-    fun hasSensor(sensorFlag: Int) = metadata and sensorFlag != 0
+    fun hasFlag(flag: Int) = metadata and flag != 0
+
+    fun addFlags(flags: Int) =
+            AirQualityLog(id, airQualityIndex, stationId, errorCode, timeStamp, metadata or flags)
 
     fun getSensorCount(): Int {
         var count = 0
         for (i in SENSORS.indices) {
-            if (hasSensor(SENSORS[i])) count += 1
+            if (hasFlag(SENSORS[i])) count += 1
         }
         return count
     }
 
-    fun hasParticulateMatterData() = hasSensor(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
+    fun hasParticulateMatterData() = hasFlag(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
 
     companion object {
         const val ERROR_CODE_SUCCESS = 0
-        const val ERROR_CODE_LOCATION_MISSING = 1
-        const val ERROR_CODE_NO_KNOWN_STATIONS = 2
-        const val ERROR_CODE_STATIONS_TOO_FAR_AWAY = 3
-        const val ERROR_CODE_AIR_QUALITY_MISSING = 4
+        const val ERROR_CODE_NO_INTERNET = 1
+        const val ERROR_CODE_LOCATION_MISSING = 2
+        const val ERROR_CODE_NO_KNOWN_STATIONS = 3
+        const val ERROR_CODE_STATIONS_TOO_FAR_AWAY = 4
+        const val ERROR_CODE_AIR_QUALITY_MISSING = 5
 
         const val FLAG_SENSOR_PM10 = 1
         const val FLAG_SENSOR_PM25 = 2
@@ -70,6 +74,10 @@ data class AirQualityLog(
         const val FLAG_SENSOR_SO2 = 16
         const val FLAG_SENSOR_C6H6 = 32
         const val FLAG_SENSOR_CO = 64
+
+        const val FLAG_USED_API = 128
+        const val FLAG_ALSO_CHECKED_BACKUP_STATION = 256
+        const val FLAG_CHOSEN_DATA_FROM_BACKUP_STATION = 512
 
         val SENSORS = listOf(
                 FLAG_SENSOR_PM10,

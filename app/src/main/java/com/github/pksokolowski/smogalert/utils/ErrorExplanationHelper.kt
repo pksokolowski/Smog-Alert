@@ -5,6 +5,7 @@ import com.github.pksokolowski.smogalert.R
 import com.github.pksokolowski.smogalert.database.AirQualityLog
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_AIR_QUALITY_MISSING
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_LOCATION_MISSING
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_INTERNET
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_SUCCESS
@@ -21,6 +22,7 @@ class ErrorExplanationHelper {
 
             return when (log.errorCode) {
                 ERROR_CODE_SUCCESS -> ""
+                ERROR_CODE_NO_INTERNET -> context.getString(R.string.error_explanation_internet)
                 ERROR_CODE_LOCATION_MISSING -> context.getString(R.string.error_explanation_location)
                 ERROR_CODE_NO_KNOWN_STATIONS -> context.getString(R.string.error_explanation_stations_missing)
                 ERROR_CODE_STATIONS_TOO_FAR_AWAY -> context.getString(R.string.error_explanation_stations_far_away)

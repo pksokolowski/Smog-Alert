@@ -14,6 +14,7 @@
     <string name="notification_error_message">An error occurred. Tap here to open the app</string>
 
     <string name="error_explanation_server">Server didn\'t have the data</string>
+    <string name="error_explanation_internet">No internet access</string>
     <string name="error_explanation_location">Location wasn\'t available</string>
     <string name="error_explanation_stations_missing">Stations data were missing</string>
     <string name="error_explanation_stations_far_away">No stations within 10km radius</string>
