@@ -1,6 +1,7 @@
 package com.github.pksokolowski.smogalert.di
 
 import com.github.pksokolowski.smogalert.airquality.AirQualityService
+import com.github.pksokolowski.smogalert.airquality.SensorsService
 import com.github.pksokolowski.smogalert.airquality.StationsService
 import dagger.Module
 import dagger.Provides
@@ -27,4 +28,9 @@ open class NetworkModule {
     @Provides
     fun provideStationsService(retrofit: Retrofit): StationsService =
             retrofit.create(StationsService::class.java)
+
+    @PerApp
+    @Provides
+    fun providesSensorsService(retrofit: Retrofit): SensorsService =
+            retrofit.create(SensorsService::class.java)
 }

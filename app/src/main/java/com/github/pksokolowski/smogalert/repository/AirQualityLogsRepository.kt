@@ -9,8 +9,6 @@ import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_INTERNET
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
-import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_ALSO_CHECKED_BACKUP_STATION
-import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_CHOSEN_DATA_FROM_BACKUP_STATION
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_USED_API
 import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
 import com.github.pksokolowski.smogalert.di.PerApp
