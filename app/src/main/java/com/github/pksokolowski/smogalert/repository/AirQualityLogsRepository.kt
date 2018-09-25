@@ -73,19 +73,19 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         var flags = FLAG_USED_API
 
         // check if the nearest station is fine, otherwise consider a further station
-        if (stations.size > 1
-                && (!nearest.hasParticulateMatterData() || nearest.airQualityIndex == -1)) {
-            flags = flags or FLAG_ALSO_CHECKED_BACKUP_STATION
-            // second API request
-            val further = getLogFromAPI(stations[1], timeStamp)
-
-            if (further.airQualityIndex != -1
-                    && further.airQualityIndex > nearest.airQualityIndex
-                    && further.hasParticulateMatterData()) {
-                flags = flags or FLAG_CHOSEN_DATA_FROM_BACKUP_STATION
-                return further.addFlags(flags)
-            }
-        }
+//        if (stations.size > 1
+//                && (!nearest.hasParticulateMatterData() || nearest.airQualityIndex == -1)) {
+//            flags = flags or FLAG_ALSO_CHECKED_BACKUP_STATION
+//            // second API request
+//            val further = getLogFromAPI(stations[1], timeStamp)
+//
+//            if (further.airQualityIndex != -1
+//                    && further.airQualityIndex > nearest.airQualityIndex
+//                    && further.hasParticulateMatterData()) {
+//                flags = flags or FLAG_CHOSEN_DATA_FROM_BACKUP_STATION
+//                return further.addFlags(flags)
+//            }
+//        }
 
         return nearest.addFlags(flags)
     }
@@ -94,11 +94,11 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         val call = airQualityService.getCurrentAQ(stationId)
         val apiResponse = try {
             call.execute().body()
-                    ?: return AirQualityLog(stationId = stationId,
+                    ?: return AirQualityLog(nearestStationId = stationId,
                             errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
                             timeStamp = timeStamp)
         } catch (e: Exception) {
-            return AirQualityLog(stationId = stationId,
+            return AirQualityLog(nearestStationId = stationId,
                     errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
                     timeStamp = timeStamp)
         }

@@ -1,6 +1,7 @@
 package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.database.AirQualityLog
+import com.github.pksokolowski.smogalert.database.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AQLogsComparer
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -8,9 +9,8 @@ import org.junit.Test
 class AQLogsComparerTest {
     @Test
     fun ignoresNoChangeCaseWithGoodAir() {
-        // no change case, good index
-        val previous = AirQualityLog(2, 0, 1, 0, 2)
-        val current = AirQualityLog(1, 0, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 0, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 0, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
@@ -18,19 +18,17 @@ class AQLogsComparerTest {
 
     @Test
     fun ignoresNoChangeCaseWithBadAir() {
-        // no change, bad index
-        val previous = AirQualityLog(2, 5, 1, 0, 2)
-        val current = AirQualityLog(1, 5, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 5, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 5, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
     }
 
     @Test
-    fun ignoresImprovementWhenNotCrossingThreshold() {
-        // air degrades but not crossing the threshold (still bad)
-        val previous = AirQualityLog(2, 4, 1, 0, 2)
-        val current = AirQualityLog(1, 5, 1, 0, 1)
+    fun ignoresDegradationWhenNotCrossingThreshold() {
+        val previous = AirQualityLog(id=1, airQualityIndex = 4, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 5, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
@@ -38,9 +36,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsDegradation() {
-        // air degraded, crossing threshold
-        val previous = AirQualityLog(2, 3, 1, 0, 2)
-        val current = AirQualityLog(1, 4, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 3, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 4, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_DEGRADED_PAST_THRESHOLD, result)
@@ -48,9 +45,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsImprovementPastThreshold() {
-        // improvement, crossing threshold
-        val previous = AirQualityLog(2, 4, 1, 0, 2)
-        val current = AirQualityLog(1, 3, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 4, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 3, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_IMPROVED_PAST_THRESHOLD, result)
@@ -60,8 +56,8 @@ class AQLogsComparerTest {
     @Test
     fun ignoresRepeatingError() {
         // location is missing twice in a row. Only the first instance of such error is to be noticed.
-        val previous = AirQualityLog(2, 4, 1, AirQualityLog.ERROR_CODE_LOCATION_MISSING, 2)
-        val current = AirQualityLog(1, 3, 1, AirQualityLog.ERROR_CODE_LOCATION_MISSING, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 4, timeStamp = 1, errorCode = AirQualityLog.ERROR_CODE_LOCATION_MISSING)
+        val current = AirQualityLog(id=2, airQualityIndex = 3, timeStamp = 2,  errorCode = AirQualityLog.ERROR_CODE_LOCATION_MISSING)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
@@ -69,9 +65,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsNewErrors() {
-        // location is missing twice in a row
-        val previous = AirQualityLog(2, 4, 1, 0, 2)
-        val current = AirQualityLog(1, 3, 1, AirQualityLog.ERROR_CODE_LOCATION_MISSING, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 4, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 3, timeStamp = 2, errorCode =  AirQualityLog.ERROR_CODE_LOCATION_MISSING)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_ERROR_EMERGED, result)
@@ -79,8 +74,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsNewDataShortage() {
-        val previous = AirQualityLog(2, 0, 1, 0, 2)
-        val current = AirQualityLog(1, -1, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = 0, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = -1, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_DATA_SHORTAGE_STARTED, result)
@@ -88,8 +83,8 @@ class AQLogsComparerTest {
 
     @Test
     fun ignoresRepetitiveDataShortage() {
-        val previous = AirQualityLog(2, -1, 1, 0, 2)
-        val current = AirQualityLog(1, -1, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = -1, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = -1, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
@@ -97,8 +92,8 @@ class AQLogsComparerTest {
 
     @Test
     fun ignoresDataShortageEnd() {
-        val previous = AirQualityLog(2, -1, 1, 0, 2)
-        val current = AirQualityLog(1, 3, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = -1, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 3, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
@@ -106,8 +101,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsBadAirRightAfterDataShortage() {
-        val previous = AirQualityLog(2, -1, 1, 0, 2)
-        val current = AirQualityLog(1, 5, 1, 0, 1)
+        val previous = AirQualityLog(id=1, airQualityIndex = -1, timeStamp = 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 5, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_DEGRADED_PAST_THRESHOLD, result)
@@ -117,7 +112,7 @@ class AQLogsComparerTest {
     fun ignoresGoodAirWhenPreviousLogIsNull() {
         // no change case, good index
         val previous = null
-        val current = AirQualityLog(1, 0, 1, 0, 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 0, timeStamp = 2)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
@@ -127,7 +122,7 @@ class AQLogsComparerTest {
     fun detectsNewErrorWhenPreviousLogIsNull() {
         // no change case, good index
         val previous = null
-        val current = AirQualityLog(1, 0, 1, AirQualityLog.ERROR_CODE_LOCATION_MISSING, 1)
+        val current = AirQualityLog(id=2, airQualityIndex = 0, timeStamp = 2, errorCode = AirQualityLog.ERROR_CODE_LOCATION_MISSING)
 
         val result = AQLogsComparer.compare(current, previous, 4)
         assertEquals(AQLogsComparer.RESULT_ERROR_EMERGED, result)
