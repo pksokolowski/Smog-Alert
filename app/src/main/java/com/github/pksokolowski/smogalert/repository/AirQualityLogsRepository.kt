@@ -9,12 +9,16 @@ import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_INTERNET
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_SUCCESS
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_USED_API
 import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
+import com.github.pksokolowski.smogalert.database.PollutionDetails
+import com.github.pksokolowski.smogalert.database.Station
 import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.location.LocationHelper
 import com.github.pksokolowski.smogalert.utils.AirQualityLogDataConverter
 import com.github.pksokolowski.smogalert.utils.InternetConnectionChecker
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import java.util.*
 import javax.inject.Inject
 
@@ -26,6 +30,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                                                    private val connectionChecker: InternetConnectionChecker) {
 
     class LogData(val log: AirQualityLog, val isFromCache: Boolean)
+
     fun getLatestLogData(): LogData {
         val timeNow = Calendar.getInstance().timeInMillis
         val latestCachedLog = airQualityLogsDao.getLatestAirQualityLog()
@@ -40,6 +45,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     class LogsData(val logs: List<AirQualityLog>, val isLatestFromCache: Boolean)
+
     fun getNLatestLogs(n: Int): LogsData {
         val isLatestFromCache = getLatestLogData().isFromCache
         return LogsData(airQualityLogsDao.getNLatestLogs(n), isLatestFromCache)
@@ -50,7 +56,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     private fun fetchFreshLog(timeStamp: Long): AirQualityLog {
-        if(!connectionChecker.isConnectionAvailable()){
+        if (!connectionChecker.isConnectionAvailable()) {
             return AirQualityLog(errorCode = ERROR_CODE_NO_INTERNET,
                     timeStamp = timeStamp)
         }
@@ -67,25 +73,45 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                     timeStamp = timeStamp)
         }
 
-        val nearest = getLogFromAPI(stations.first(), timeStamp)
+        var details = PollutionDetails()
+        var gainedCoverage = SensorsPresence()
+        var expectedCoverage = SensorsPresence()
         var flags = FLAG_USED_API
+        var passes = 0
 
-        // check if the nearest station is fine, otherwise consider a further station
-//        if (stations.size > 1
-//                && (!nearest.hasParticulateMatterData() || nearest.airQualityIndex == -1)) {
-//            flags = flags or FLAG_ALSO_CHECKED_BACKUP_STATION
-//            // second API request
-//            val further = getLogFromAPI(stations[1], timeStamp)
-//
-//            if (further.airQualityIndex != -1
-//                    && further.airQualityIndex > nearest.airQualityIndex
-//                    && further.hasParticulateMatterData()) {
-//                flags = flags or FLAG_CHOSEN_DATA_FROM_BACKUP_STATION
-//                return further.addFlags(flags)
-//            }
-//        }
+        for (s in stations) {
+            val sensors = if (s.sensorFlags > 0) {
+                s.sensorFlags
+            } else {
+                stationsRepository.fetchSensorsData(s.id)?.sensorFlags ?: continue
+            }
 
-        return nearest.addFlags(flags)
+            val expectedCoverageWithSIncluded = expectedCoverage.combinedWith(sensors)
+            if (expectedCoverageWithSIncluded == expectedCoverage) continue
+            expectedCoverage = expectedCoverageWithSIncluded
+
+            val log = getLogFromAPI(s.id, timeStamp)
+            val logsSensorCoverage = log.details.getSensorCoverage()
+            gainedCoverage = gainedCoverage.combinedWith(logsSensorCoverage)
+            details = details.combinedWith(log.details)
+
+            if (gainedCoverage.hasFullCoverage()) break
+            if (++passes == MAX_STATION_REQUESTS) break
+        }
+
+        val airQualityIndex = if (gainedCoverage.hasSensors(expectedCoverage)) {
+            details.getHighestIndex()
+        } else {
+            -1
+        }
+
+        return AirQualityLog(0,
+                airQualityIndex,
+                details,
+                stations.first().id,
+                ERROR_CODE_SUCCESS,
+                timeStamp,
+                flags)
     }
 
     private fun getLogFromAPI(stationId: Long, timeStamp: Long): AirQualityLog {
@@ -107,11 +133,11 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                 timeStamp)
     }
 
-    private fun getNearestStationsIDs(location: Location): List<Long>? {
+    private fun getNearestStationsIDs(location: Location): List<Station>? {
         val stations = stationsRepository.getStations()
         if (stations.isEmpty()) return null
 
-        class StationAndDistance(val stationId: Long, val distance: Float)
+        class StationAndDistance(val station: Station, val distance: Float)
 
         val nearbyStations = mutableListOf<StationAndDistance>()
 
@@ -122,16 +148,18 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             }
             val distanceInMeters = location.distanceTo(stationLocation)
             if (distanceInMeters <= ACCEPTABLE_DISTANCE_TO_STATION) {
-                nearbyStations.add(StationAndDistance(it.id, distanceInMeters))
+                nearbyStations.add(StationAndDistance(it, distanceInMeters))
             }
         }
 
         val sorted = nearbyStations.sortedWith(compareBy(StationAndDistance::distance))
-        return List(sorted.size) { sorted[it].stationId }
+        return List(sorted.size) { sorted[it].station }
     }
 
     private companion object {
         const val ACCEPTABLE_LOG_AGE = 30 * 60000 - 1
         const val ACCEPTABLE_DISTANCE_TO_STATION = 10000F
+
+        const val MAX_STATION_REQUESTS = 4
     }
 }

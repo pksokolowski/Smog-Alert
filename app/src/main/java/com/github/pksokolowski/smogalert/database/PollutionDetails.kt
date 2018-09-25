@@ -34,10 +34,18 @@ class PollutionDetails {
 
     fun getDetailsArray(): Array<Int> = Array(pollutionData.size) { pollutionData[it] }
 
+    fun getHighestIndex(): Int {
+        var highest = -1
+        for (i in pollutionData) {
+            if (i > highest) highest = i
+        }
+        return highest
+    }
+
     fun encode(): Int {
         var encoded = 0
         for (i in pollutionData.indices) {
-            val valueTuUse = if(pollutionData[i] == -1) 9 else pollutionData[i]
+            val valueTuUse = if (pollutionData[i] == -1) 9 else pollutionData[i]
             val multiplier = Math.pow(10.0, ((NUMBER_OF_POSSIBLE_SENSORS - 1.0) - i)).toInt()
             encoded += valueTuUse * multiplier
         }
@@ -62,7 +70,7 @@ class PollutionDetails {
         val detailsArray = getDetailsArray()
         var sensorFlags = 0
         for (i in detailsArray.indices) {
-            if (detailsArray[i] == -1 ) continue
+            if (detailsArray[i] == -1) continue
             sensorFlags = sensorFlags or SENSORS_PRESENCE_FLAGS_IN_LOCAL_ORDER[i]
         }
         return SensorsPresence(sensorFlags)

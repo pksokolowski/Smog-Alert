@@ -1,10 +1,16 @@
 package com.github.pksokolowski.smogalert.utils
 
-class SensorsPresence(private val sensorFlags: Int = 0) {
+data class SensorsPresence(private val sensorFlags: Int = 0) {
 
     fun hasSensors(sensorFlags: Int) = containsSensors(this.sensorFlags, sensorFlags)
 
-    fun combineWith(sensorFlags: Int) = SensorsPresence(combineSensors(this.sensorFlags, sensorFlags))
+    fun hasSensors(sensorsPresence: SensorsPresence) = containsSensors(this.sensorFlags, sensorsPresence.sensorFlags)
+
+    fun hasFullCoverage() = sensorFlags == FULL_COVERAGE_VALUE
+
+    fun combinedWith(sensorFlags: Int) = SensorsPresence(combineSensors(this.sensorFlags, sensorFlags))
+
+    fun combinedWith(sensorsPresence: SensorsPresence) = combinedWith(sensorsPresence.sensorFlags)
 
     companion object {
 
@@ -19,5 +25,6 @@ class SensorsPresence(private val sensorFlags: Int = 0) {
         const val FLAG_SENSOR_SO2 = 16
         const val FLAG_SENSOR_C6H6 = 32
         const val FLAG_SENSOR_CO = 64
+        private const val FULL_COVERAGE_VALUE = 127
     }
 }
