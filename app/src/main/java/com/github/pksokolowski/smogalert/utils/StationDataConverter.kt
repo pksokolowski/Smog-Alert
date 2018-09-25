@@ -13,7 +13,7 @@ class StationDataConverter{
             val latitude = stationModel.latitude?.toDouble() ?: return null
             val longitude = stationModel.longitude?.toDouble() ?: return null
 
-            return Station(id, latitude, longitude)
+            return Station(id, 0, latitude, longitude)
         }
     }
 }

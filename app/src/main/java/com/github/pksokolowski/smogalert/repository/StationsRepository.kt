@@ -1,16 +1,21 @@
 package com.github.pksokolowski.smogalert.repository
 
+import com.github.pksokolowski.smogalert.airquality.SensorsService
 import com.github.pksokolowski.smogalert.airquality.StationsService
 import com.github.pksokolowski.smogalert.database.Station
 import com.github.pksokolowski.smogalert.database.StationsDao
 import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.utils.ICacheMetadataHelper
+import com.github.pksokolowski.smogalert.utils.SensorsDataConverter
 import com.github.pksokolowski.smogalert.utils.StationDataConverter
 import java.util.*
 import javax.inject.Inject
 
 @PerApp
-class StationsRepository @Inject constructor(private val stationsDao: StationsDao, private val stationsService: StationsService, private val metadataHelper: ICacheMetadataHelper) {
+class StationsRepository @Inject constructor(private val stationsDao: StationsDao,
+                                             private val stationsService: StationsService,
+                                             private val sensorsService: SensorsService,
+                                             private val metadataHelper: ICacheMetadataHelper) {
 
     fun getStations(): List<Station> {
         val timeNow = Calendar.getInstance().timeInMillis
@@ -91,6 +96,24 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
         return List(stationsFromApi.size) { i ->
             StationDataConverter.toStation(stationsFromApi[i]) ?: return null
         }
+    }
+
+    fun fetchSensorsData(stationId: Long): Station? {
+        val cachedVersion = stationsDao.getStationById(stationId) ?: return null
+        if (cachedVersion.sensorFlags == 0) {
+            val sensors = try {
+                sensorsService.getSensors(stationId).execute().body() ?: return null
+            } catch (e: Exception) {
+                return null
+            }
+
+            val sensorsFlags = SensorsDataConverter.toSensorFlags(sensors) ?: return null
+            val updatedStation = cachedVersion.assignSensors(sensorsFlags)
+            stationsDao.updateStation(updatedStation)
+
+            return updatedStation
+        }
+        return cachedVersion
     }
 
     private companion object {

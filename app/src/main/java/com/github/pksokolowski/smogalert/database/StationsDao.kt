@@ -7,6 +7,12 @@ interface StationsDao {
     @Query("SELECT * FROM stations ORDER BY id ASC")
     fun getStations(): List<Station>
 
+    @Query("SELECT * FROM stations WHERE id = :id")
+    fun getStationById(id: Long): Station?
+
+    @Update
+    fun updateStation(station: Station)
+
     @Insert
     fun insertStations(stations: List<Station>)
 

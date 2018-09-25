@@ -10,9 +10,15 @@ data class Station(
         @ColumnInfo(name = "id")
         val id: Long,
 
+        @ColumnInfo(name = "sensor_flags")
+        val sensorFlags: Int,
+
         @ColumnInfo(name = "latitude")
         val latitude: Double,
 
         @ColumnInfo(name = "longitude")
         val longitude: Double
-)
+) {
+    fun assignSensors(sensorFlags: Int) =
+            Station(id, sensorFlags, latitude, longitude)
+}
