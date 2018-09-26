@@ -4,7 +4,7 @@ import android.arch.persistence.room.*
 
 @Dao
 interface StationsUpdateLogsDao {
-    @Query("SELECT * FROM stations_update_log ORDER BY id DESC LIMIT 1")
+    @Query("SELECT * FROM stations_update_logs ORDER BY id DESC LIMIT 1")
     fun getLastLog(): StationsUpdateLog?
 
     @Insert

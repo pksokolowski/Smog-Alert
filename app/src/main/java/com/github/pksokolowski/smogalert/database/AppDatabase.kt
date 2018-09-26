@@ -9,7 +9,7 @@ import android.arch.persistence.room.TypeConverters
             AirQualityLog::class,
             Station::class,
             StationsUpdateLog::class],
-        version = 8,
+        version = 9,
         exportSchema = true
 )
 @TypeConverters(Converters::class)
