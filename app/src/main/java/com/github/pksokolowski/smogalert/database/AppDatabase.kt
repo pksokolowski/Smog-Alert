@@ -7,8 +7,9 @@ import android.arch.persistence.room.TypeConverters
 @Database(
         entities = [
             AirQualityLog::class,
-            Station::class],
-        version = 7,
+            Station::class,
+            StationsUpdateLog::class],
+        version = 8,
         exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -16,5 +17,6 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun airQualityLogsDao(): AirQualityLogsDao
     abstract fun stationsDao(): StationsDao
+    abstract fun stationsUpdateLogsDao(): StationsUpdateLogsDao
 
 }

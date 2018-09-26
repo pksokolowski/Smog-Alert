@@ -4,8 +4,12 @@ import com.github.pksokolowski.smogalert.airquality.SensorsService
 import com.github.pksokolowski.smogalert.airquality.StationsService
 import com.github.pksokolowski.smogalert.database.Station
 import com.github.pksokolowski.smogalert.database.StationsDao
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_FAILURE_POSTPONED
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_FAILURE_RETRY_SOON
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_SUCCESS
+import com.github.pksokolowski.smogalert.database.StationsUpdateLogsDao
 import com.github.pksokolowski.smogalert.di.PerApp
-import com.github.pksokolowski.smogalert.utils.ICacheMetadataHelper
 import com.github.pksokolowski.smogalert.utils.SensorsDataConverter
 import com.github.pksokolowski.smogalert.utils.StationDataConverter
 import java.util.*
@@ -15,31 +19,46 @@ import javax.inject.Inject
 class StationsRepository @Inject constructor(private val stationsDao: StationsDao,
                                              private val stationsService: StationsService,
                                              private val sensorsService: SensorsService,
-                                             private val metadataHelper: ICacheMetadataHelper) {
+                                             private val stationsUpdateLogsDao: StationsUpdateLogsDao) {
 
     fun getStations(): List<Station> {
-        val timeNow = Calendar.getInstance().timeInMillis
-        val plannedUpdateTime = metadataHelper.getPlannedCacheUpdateTime()
-
-        if (timeNow >= plannedUpdateTime) {
+        if (shouldUpdateCache()) {
             val updateResult = updateCache()
 
-            return if (updateResult.status == SUCCESS) {
-                metadataHelper.setNextUpdateTime(timeNow + CACHE_UPDATE_INTERVAL_AFTER_SUCCESS)
-                updateResult.stations
+            if (updateResult.status == SUCCESS) {
+                logCacheUpdate(STATUS_SUCCESS)
             } else {
-                val updateInterval = if (updateResult.stations.isNotEmpty()) CACHE_UPDATE_INTERVAL_AFTER_FAILURE
-                else CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE
-
-                with(metadataHelper) {
-                    incrementFailedUpdatesCount()
-                    setNextUpdateTime(timeNow + updateInterval)
+                if (updateResult.stations.isNotEmpty()) {
+                    logCacheUpdate(STATUS_FAILURE_POSTPONED)
+                } else {
+                    logCacheUpdate(STATUS_FAILURE_RETRY_SOON)
                 }
-                updateResult.stations
             }
+            return updateResult.stations
         }
 
         return stationsDao.getStations()
+    }
+
+    private fun shouldUpdateCache(): Boolean {
+        val log = stationsUpdateLogsDao.getLastLog() ?: return true
+        val timeNow = Calendar.getInstance().timeInMillis
+
+        val updateInterval = when (log.status) {
+            STATUS_SUCCESS -> CACHE_UPDATE_INTERVAL_AFTER_SUCCESS
+            STATUS_FAILURE_POSTPONED -> CACHE_UPDATE_INTERVAL_AFTER_FAILURE
+            STATUS_FAILURE_RETRY_SOON -> CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE
+            else -> 0
+        }
+
+        val nextPlannedUpdateTime = log.timeStamp + updateInterval
+        if (timeNow >= nextPlannedUpdateTime) return true
+        return false
+    }
+
+    private fun logCacheUpdate(status: Int) {
+        val timeNow = Calendar.getInstance().timeInMillis
+        stationsUpdateLogsDao.insertLog(StationsUpdateLog(0, status, timeNow))
     }
 
     private fun updateCache(): UpdateOperationResult {
@@ -47,6 +66,11 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
         val stationsFromDb = stationsDao.getStations()
         val stationsFromApi = getStationsFromApi()
                 ?: return UpdateOperationResult(FAILURE, stationsFromDb)
+
+        // if there are suspiciously many or few stations, indicate failure
+        with(stationsFromApi) {
+            if (size > 10000 || size == 0) return UpdateOperationResult(FAILURE, stationsFromDb)
+        }
 
         // transform into hashMaps for quick searches
         val apiStationsMap = stationsFromApi.map { it.id to it }.toMap()

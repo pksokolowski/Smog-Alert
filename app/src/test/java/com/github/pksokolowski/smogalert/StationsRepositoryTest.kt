@@ -6,8 +6,9 @@ import com.github.pksokolowski.smogalert.airquality.models.SensorsModel
 import com.github.pksokolowski.smogalert.airquality.models.StationModel
 import com.github.pksokolowski.smogalert.database.Station
 import com.github.pksokolowski.smogalert.database.StationsDao
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog
+import com.github.pksokolowski.smogalert.database.StationsUpdateLogsDao
 import com.github.pksokolowski.smogalert.repository.StationsRepository
-import com.github.pksokolowski.smogalert.utils.ICacheMetadataHelper
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import okhttp3.Request
 import org.junit.Assert.*
@@ -64,8 +65,8 @@ class StationsRepositoryTest {
         assertEquals(0, repoData.dao.mInsertedStationsCount)
         assertEquals(1, repoData.dao.mUpdatedStationsCount)
 
-        for(s in stations){
-            if(s.sensorFlags != 0) fail("no stations should have sensor data after a cache update")
+        for (s in stations) {
+            if (s.sensorFlags != 0) fail("no stations should have sensor data after a cache update")
         }
     }
 
@@ -171,7 +172,7 @@ class StationsRepositoryTest {
         for (s in stations) {
             val sensorFlags = repo.fetchSensorsData(s.id)?.sensorFlags
             val expectedValueSource = SensorsServiceMock.getExpectedValuePerStationId(s.id)
-            if(sensorFlags == null || !expectedValueSource.hasSensors(sensorFlags)) fail("sensors retrieved are not correct")
+            if (sensorFlags == null || !expectedValueSource.hasSensors(sensorFlags)) fail("sensors retrieved are not correct")
         }
     }
 
@@ -204,12 +205,10 @@ class StationsRepositoryTest {
      * Long.MAX_VALUE to prevent any cache updates.
      */
     private fun prepareFreshRepository(cached: List<Station>,
-                                       online: List<Station>,
-                                       plannedNextUpdate: Long = 0,
-                                       errorsCount: Int = 0): RepoData {
+                                       online: List<Station>): RepoData {
         val dao = StationsDaoMock(cached)
         val service = StationsServiceMock(online)
-        val metadata = MetadataHelperMock(plannedNextUpdate, errorsCount)
+        val metadata = StationsUpdateLogsDaoMock(listOf())
 
         val repo = StationsRepository(dao, service, SensorsServiceMock(), metadata)
         return RepoData(repo, dao, service, metadata)
@@ -218,7 +217,18 @@ class StationsRepositoryTest {
     private class RepoData(val repo: StationsRepository,
                            val dao: StationsDaoMock,
                            val service: StationsServiceMock,
-                           val metadata: MetadataHelperMock)
+                           val stationsUpdateLogsDao: StationsUpdateLogsDaoMock)
+
+    private class StationsUpdateLogsDaoMock(logs: List<StationsUpdateLog>) : StationsUpdateLogsDao {
+        val mLogs = logs.toMutableList()
+        override fun getLastLog(): StationsUpdateLog? {
+            return mLogs.lastOrNull()
+        }
+
+        override fun insertLog(log: StationsUpdateLog) {
+            mLogs.add(log)
+        }
+    }
 
     private class StationsDaoMock(stations: List<Station>) : StationsDao {
         override fun getStationById(id: Long): Station? {
@@ -381,22 +391,6 @@ class StationsRepositoryTest {
                 return Response.success(sensors)
             }
         }
-    }
-
-    private class MetadataHelperMock(private var plannedNextUpdate: Long,
-                                     private var errorsCount: Int) : ICacheMetadataHelper {
-        override fun getPlannedCacheUpdateTime() = plannedNextUpdate
-
-        override fun setNextUpdateTime(timeStamp: Long) {
-            plannedNextUpdate = timeStamp
-        }
-
-        override fun readFailedUpdatesCount() = errorsCount
-
-        override fun incrementFailedUpdatesCount() {
-            errorsCount++
-        }
-
     }
 
     companion object {
