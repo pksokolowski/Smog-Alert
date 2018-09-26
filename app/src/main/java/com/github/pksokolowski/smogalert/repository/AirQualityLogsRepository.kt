@@ -141,11 +141,13 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
 
         val nearbyStations = mutableListOf<StationAndDistance>()
 
+        // reusable location object
+        val stationLocation = Location("station")
+
         stations.forEach {
-            val stationLocation = Location("station").apply {
-                latitude = it.latitude
-                longitude = it.longitude
-            }
+            stationLocation.latitude = it.latitude
+            stationLocation.longitude = it.longitude
+
             val distanceInMeters = location.distanceTo(stationLocation)
             if (distanceInMeters <= ACCEPTABLE_DISTANCE_TO_STATION) {
                 nearbyStations.add(StationAndDistance(it, distanceInMeters))
