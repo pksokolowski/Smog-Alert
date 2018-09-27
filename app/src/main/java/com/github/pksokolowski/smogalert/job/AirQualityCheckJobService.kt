@@ -7,6 +7,7 @@ import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DAT
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DEGRADED_PAST_THRESHOLD
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_ERROR_EMERGED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_IMPROVED_PAST_THRESHOLD
+import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_OK_AFTER_SHORTAGE_ENDED
 import com.github.pksokolowski.smogalert.notifications.NotificationHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogsData
@@ -63,6 +64,7 @@ class AirQualityCheckJobService : JobService() {
                 when (comparisonResult) {
                     RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
                     RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
+                    RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
                     RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
                     RESULT_ERROR_EMERGED -> notificationHelper.showError()
                     else -> {

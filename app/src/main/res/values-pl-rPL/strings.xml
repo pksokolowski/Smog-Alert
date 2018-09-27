@@ -12,6 +12,7 @@
     <string name="notification_alerts_message">Jakość powietrza pogorszyła się</string>
     <string name="notification_improvement_message">Jakość powietrza poprawiła się</string>
     <string name="notification_data_shortage_message">Brak danych o jakości powietrza</string>
+    <string name="notification_data_shortage_over_air_ok_message">Zanieczyszczenie powietrza poniżej poziomu ostrzegania</string>
     <string name="notification_error_message">Wystąpił błąd. Dotknij aby otworzyć aplikację</string>
 
     <string name="error_explanation_server">Brak danych na serverze</string>

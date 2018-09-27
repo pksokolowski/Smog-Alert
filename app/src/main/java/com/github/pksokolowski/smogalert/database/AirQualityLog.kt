@@ -60,7 +60,7 @@ data class AirQualityLog(
         const val ERROR_CODE_STATIONS_TOO_FAR_AWAY = 4
         const val ERROR_CODE_AIR_QUALITY_MISSING = 5
 
-        const val FLAG_USED_API = 128
+        const val FLAG_USED_API = 1
     }
 
 }
