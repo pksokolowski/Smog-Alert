@@ -7,6 +7,8 @@ import com.github.pksokolowski.smogalert.airquality.models.StationModel
 import com.github.pksokolowski.smogalert.database.Station
 import com.github.pksokolowski.smogalert.database.StationsDao
 import com.github.pksokolowski.smogalert.database.StationsUpdateLog
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_FAILURE_POSTPONED
+import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_SUCCESS
 import com.github.pksokolowski.smogalert.database.StationsUpdateLogsDao
 import com.github.pksokolowski.smogalert.repository.StationsRepository
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
@@ -22,48 +24,89 @@ import java.util.*
 class StationsRepositoryTest {
 
     @Test
+    fun doesNotUpdateCachePrematurely() {
+        val data = prepareFreshRepository(
+                getSampleStationsList(75),
+                getSampleStationsList(100).randomlySwapItems(10),
+                listOf(
+                        StationsUpdateLog(1, STATUS_SUCCESS, 0),
+                        StationsUpdateLog(2, STATUS_SUCCESS, 100),
+                        StationsUpdateLog(3, STATUS_SUCCESS, Calendar.getInstance().timeInMillis))
+        )
+
+        // if it chooses to update the cache, it has to reach out to the API, which indicates failure
+        data.repo.getStations()
+
+        if (data.service.mStationsRequestsCount > 0) fail("updated cache when it didn\'t have to.")
+    }
+
+    @Test
+    fun doesUpdateCacheWhenTooOld() {
+        val day = 86400000L /* a day in milliseconds */
+        val oldCacheTimeStamp = Calendar.getInstance().timeInMillis - 40 * day
+        val data = prepareFreshRepository(
+                getSampleStationsList(75),
+                getSampleStationsList(100).randomlySwapItems(10),
+                listOf(
+                        StationsUpdateLog(1, STATUS_SUCCESS, 0),
+                        StationsUpdateLog(2, STATUS_SUCCESS, 100),
+                        StationsUpdateLog(3, STATUS_SUCCESS, oldCacheTimeStamp))
+        )
+
+        data.repo.getStations()
+
+        with(data.service.mStationsRequestsCount) {
+            if (this == 0) fail("didn't update cache despite it being too old")
+            if (this > 1) fail("sent more than one api request for an up to date stations list")
+        }
+    }
+
+    @Test
+    fun rejectsApiResponseWhenNoStationsAreReturned() {
+        val data = prepareFreshRepository(
+                getSampleStationsList(),
+                getSampleStationsList(0)
+        )
+
+        val stations = data.repo.getStations()
+        assertEquals(0, data.dao.mDeletedStationsCount)
+        assertEquals(0, data.dao.mInsertedStationsCount)
+        assertEquals(0, data.dao.mUpdatedStationsCount)
+        val lastLog = data.stationsUpdateLogsDao.getLastLog()
+        if (lastLog == null
+                || lastLog.id != 1L
+                || lastLog.status != STATUS_FAILURE_POSTPONED) fail("log of a failed update was incorrect")
+    }
+
+    @Test
     fun doesNothingWhenCacheAndApiVersionsAreSame() {
-        val size = 151
-        val seed = 0L
-        val cached = getSampleStationsList(size, seed)
-        val api = getSampleStationsList(size, seed)
+        val data = prepareFreshRepository(
+                getSampleStationsList().randomlySwapItems(13, 47),
+                getSampleStationsList().randomlySwapItems(30, 55)
+        )
 
-        cached.randomlySwapItems(13, 47)
-        api.randomlySwapItems(30, 55)
-
-        val repoData = prepareFreshRepository(cached, api)
-        val repo = repoData.repo
-
-
-        val stations = repo.getStations()
-        assertArrayEquals(api.toTypedArray(), stations.toTypedArray())
-        assertEquals(0, repoData.dao.mDeletedStationsCount)
-        assertEquals(0, repoData.dao.mInsertedStationsCount)
-        assertEquals(0, repoData.dao.mUpdatedStationsCount)
+        val stations = data.repo.getStations()
+        assertArrayEquals(data.online.toTypedArray(), stations.toTypedArray())
+        assertEquals(0, data.dao.mDeletedStationsCount)
+        assertEquals(0, data.dao.mInsertedStationsCount)
+        assertEquals(0, data.dao.mUpdatedStationsCount)
     }
 
     @Test
     fun updatesCacheErasingOldSensorsData() {
-        val size = 151
-        val seed = 0L
-        val cached = getSampleStationsList(size, seed)
-        val api = getSampleStationsList(size, seed)
-
-        cached.randomlySwapItems(13, 47)
-        api.randomlySwapItems(30, 55)
+        val cached = getSampleStationsList().randomlySwapItems(13, 47)
+        val api = getSampleStationsList().randomlySwapItems(30, 55)
 
         // assign some random sensor to see if it's erased corectly
         cached[2] = cached[2].assignSensors(128)
 
-        val repoData = prepareFreshRepository(cached, api)
-        val repo = repoData.repo
+        val data = prepareFreshRepository(cached, api)
 
-
-        val stations = repo.getStations()
+        val stations = data.repo.getStations()
         assertArrayEquals(api.toTypedArray(), stations.toTypedArray())
-        assertEquals(0, repoData.dao.mDeletedStationsCount)
-        assertEquals(0, repoData.dao.mInsertedStationsCount)
-        assertEquals(1, repoData.dao.mUpdatedStationsCount)
+        assertEquals(0, data.dao.mDeletedStationsCount)
+        assertEquals(0, data.dao.mInsertedStationsCount)
+        assertEquals(1, data.dao.mUpdatedStationsCount)
 
         for (s in stations) {
             if (s.sensorFlags != 0) fail("no stations should have sensor data after a cache update")
@@ -73,53 +116,42 @@ class StationsRepositoryTest {
     @Test
     fun addsNewStationCorrectly() {
         val size = 151
-        val seed = 0L
-        val cached = getSampleStationsList(size, seed)
-        val api = getSampleStationsList(size + 1, seed)
+        val data = prepareFreshRepository(
+                getSampleStationsList(size).randomlySwapItems(40, 1),
+                getSampleStationsList(size + 1).randomlySwapItems(60, 2)
+        )
 
-        cached.randomlySwapItems(40, 1)
-        api.randomlySwapItems(60, 2)
+        val stations = data.repo.getStations()
 
-        val repoData = prepareFreshRepository(cached, api)
-        val repo = repoData.repo
-
-        val stations = repo.getStations()
-
-        assertArrayEquals("should have returned the list from API", api.toTypedArray(), stations.toTypedArray())
-        assertEquals(0, repoData.dao.mDeletedStationsCount)
-        assertEquals(1, repoData.dao.mInsertedStationsCount)
-        assertEquals(0, repoData.dao.mUpdatedStationsCount)
+        assertArrayEquals("should have returned the list from API", data.online.toTypedArray(), stations.toTypedArray())
+        assertEquals(0, data.dao.mDeletedStationsCount)
+        assertEquals(1, data.dao.mInsertedStationsCount)
+        assertEquals(0, data.dao.mUpdatedStationsCount)
     }
 
     @Test
     fun removesStationsCorrectly() {
         val size = 151
-        val seed = 0L
-        val cached = getSampleStationsList(size, seed)
-        val api = getSampleStationsList(size - 5, seed)
+        val data = prepareFreshRepository(
+                getSampleStationsList(size).randomlySwapItems(40, 1),
+                getSampleStationsList(size - 5).randomlySwapItems(60, 2)
+        )
 
-        cached.randomlySwapItems(40, 1)
-        api.randomlySwapItems(60, 2)
+        val stations = data.repo.getStations()
 
-        val repoData = prepareFreshRepository(cached, api)
-        val repo = repoData.repo
+        assertArrayEquals("should have returned the list from API", data.online.toTypedArray(), stations.toTypedArray())
+        assertEquals(5, data.dao.mDeletedStationsCount)
+        assertEquals(0, data.dao.mInsertedStationsCount)
+        assertEquals(0, data.dao.mUpdatedStationsCount)
 
-        val stations = repo.getStations()
-
-        assertArrayEquals("should have returned the list from API", api.toTypedArray(), stations.toTypedArray())
-        assertEquals(5, repoData.dao.mDeletedStationsCount)
-        assertEquals(0, repoData.dao.mInsertedStationsCount)
-        assertEquals(0, repoData.dao.mUpdatedStationsCount)
-
-        assertEquals("should have used api service", 1, repoData.service.mStationsRequestsCount)
+        assertEquals("should have used api service", 1, data.service.mStationsRequestsCount)
     }
 
     @Test
     fun combinesAddRemoveAndUpdateCorrectly() {
         val size = 151
-        val seed = 0L
-        val cached = getSampleStationsList(size, seed)
-        val api = getSampleStationsList(size - 15, seed)
+        val cached = getSampleStationsList(size)
+        val api = getSampleStationsList(size - 15)
 
         //add new stations
         api.addAll(listOf(Station(405, 0, 47.123, 19.321),
@@ -131,37 +163,33 @@ class StationsRepositoryTest {
         cached.randomlySwapItems(40, 1)
         api.randomlySwapItems(60, 2)
 
-        val repoData = prepareFreshRepository(cached, api)
-        val repo = repoData.repo
+        val data = prepareFreshRepository(cached, api)
 
-        val stations = repo.getStations()
+        val stations = data.repo.getStations()
 
         assertArrayEquals("should have returned the list from API", api.toTypedArray(), stations.toTypedArray())
-        assertEquals(15, repoData.dao.mDeletedStationsCount)
-        assertEquals(2, repoData.dao.mInsertedStationsCount)
-        assertEquals(1, repoData.dao.mUpdatedStationsCount)
+        assertEquals(15, data.dao.mDeletedStationsCount)
+        assertEquals(2, data.dao.mInsertedStationsCount)
+        assertEquals(1, data.dao.mUpdatedStationsCount)
 
-        assertEquals("should have used api service", 1, repoData.service.mStationsRequestsCount)
+        assertEquals("should have used api service", 1, data.service.mStationsRequestsCount)
     }
 
     @Test
     fun usesCacheInsteadWhenItsFresh() {
-        val size = 151
-        val seed = 0L
-        val cached = getSampleStationsList(size, seed)
-        val api = getSampleStationsList(size, seed)
+        val data = prepareFreshRepository(
+                getSampleStationsList(),
+                getSampleStationsList()
+        )
 
-        val repoData = prepareFreshRepository(cached, api)
-        val repo = repoData.repo
-
-        val stations = repo.getStations()
-        assertEquals("should have used api service", 1, repoData.service.mStationsRequestsCount)
-        assertEquals("should have used cache for comparison", 1, repoData.dao.mStationsRequestsCount)
+        val stations = data.repo.getStations()
+        assertEquals("should have used api service", 1, data.service.mStationsRequestsCount)
+        assertEquals("should have used cache for comparison", 1, data.dao.mStationsRequestsCount)
 
         // second call should use cache instead of API, because cache is presumably up to date now.
-        val stationsFromCache = repo.getStations()
-        assertEquals("should not use API secondTime!", 1, repoData.service.mStationsRequestsCount)
-        assertEquals("should have used cache", 2, repoData.dao.mStationsRequestsCount)
+        val stationsFromCache = data.repo.getStations()
+        assertEquals("should not use API secondTime!", 1, data.service.mStationsRequestsCount)
+        assertEquals("should have used cache", 2, data.dao.mStationsRequestsCount)
 
     }
 
@@ -176,7 +204,7 @@ class StationsRepositoryTest {
         }
     }
 
-    private fun getSampleStationsList(n: Int, seed: Long = 0): MutableList<Station> {
+    private fun getSampleStationsList(n: Int = 100, seed: Long = 0): MutableList<Station> {
         val random = Random(seed)
         fun next() = (random.nextDouble() * 5) - 2.5
         return MutableList(n) {
@@ -186,7 +214,7 @@ class StationsRepositoryTest {
         }
     }
 
-    private fun MutableList<Station>.randomlySwapItems(times: Int, seed: Long) {
+    private fun MutableList<Station>.randomlySwapItems(times: Int, seed: Long = 0): MutableList<Station> {
         val random = Random(seed)
         for (i in 1..times) {
             val A = random.nextInt(this.size)
@@ -196,6 +224,7 @@ class StationsRepositoryTest {
             this[A] = this[B]
             this[B] = item
         }
+        return this
     }
 
     /**
@@ -203,21 +232,28 @@ class StationsRepositoryTest {
      * API data available 'online', as well as metadata, which has default values provided already.
      * With the defaults the repo will always update cache. Set plannedNextUpdate parameter to
      * Long.MAX_VALUE to prevent any cache updates.
+     *
+     * Returned object also contains the original data fed to the mock objects.
      */
     private fun prepareFreshRepository(cached: List<Station>,
-                                       online: List<Station>): RepoData {
+                                       online: List<Station>,
+                                       updateLogs: List<StationsUpdateLog> = listOf()): RepoData {
         val dao = StationsDaoMock(cached)
         val service = StationsServiceMock(online)
-        val metadata = StationsUpdateLogsDaoMock(listOf())
+        val logs = StationsUpdateLogsDaoMock(updateLogs)
 
-        val repo = StationsRepository(dao, service, SensorsServiceMock(), metadata)
-        return RepoData(repo, dao, service, metadata)
+        val repo = StationsRepository(dao, service, SensorsServiceMock(), logs)
+        return RepoData(repo, dao, service, logs, cached, online, updateLogs)
     }
 
     private class RepoData(val repo: StationsRepository,
                            val dao: StationsDaoMock,
                            val service: StationsServiceMock,
-                           val stationsUpdateLogsDao: StationsUpdateLogsDaoMock)
+                           val stationsUpdateLogsDao: StationsUpdateLogsDaoMock,
+                           val cached: List<Station>,
+                           val online: List<Station>,
+                           val updateLogs: List<StationsUpdateLog>
+    )
 
     private class StationsUpdateLogsDaoMock(logs: List<StationsUpdateLog>) : StationsUpdateLogsDao {
         val mLogs = logs.toMutableList()
@@ -226,7 +262,7 @@ class StationsRepositoryTest {
         }
 
         override fun insertLog(log: StationsUpdateLog) {
-            mLogs.add(log)
+            mLogs.add(StationsUpdateLog(mLogs.size + 1L, log.status, log.timeStamp))
         }
     }
 
