@@ -15,7 +15,7 @@ open class NetworkModule {
     @PerApp
     @Provides
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
-            .baseUrl("http://api.gios.gov.pl/pjp-api/rest/")
+            .baseUrl("https://api.gios.gov.pl/pjp-api/rest/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
