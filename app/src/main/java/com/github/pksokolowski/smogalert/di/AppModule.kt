@@ -2,10 +2,7 @@ package com.github.pksokolowski.smogalert.di
 
 import android.app.Application
 import android.arch.persistence.room.Room
-import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
-import com.github.pksokolowski.smogalert.database.AppDatabase
-import com.github.pksokolowski.smogalert.database.StationsDao
-import com.github.pksokolowski.smogalert.database.StationsUpdateLogsDao
+import com.github.pksokolowski.smogalert.database.*
 import com.github.pksokolowski.smogalert.utils.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
@@ -21,6 +18,7 @@ open class AppModule {
         return Room
                 .databaseBuilder(app, AppDatabase::class.java, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
+                .addCallback(CreateTriggersCallback)
                 .build()
     }
 
