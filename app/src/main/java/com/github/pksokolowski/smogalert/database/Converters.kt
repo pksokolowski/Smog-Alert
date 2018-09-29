@@ -4,9 +4,9 @@ import android.arch.persistence.room.TypeConverter
 
 class Converters {
     @TypeConverter
-    fun calendarToDatestamp(pollutionDetails: PollutionDetails): Int = pollutionDetails.encode()
+    fun encodePollutionDetails(pollutionDetails: PollutionDetails): Int = pollutionDetails.encode()
 
     @TypeConverter
-    fun datestampToCalendar(value: Int): PollutionDetails =
+    fun decodePollutionDetails(value: Int): PollutionDetails =
             PollutionDetails(value)
 }

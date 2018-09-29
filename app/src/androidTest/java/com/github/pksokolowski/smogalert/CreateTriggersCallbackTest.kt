@@ -32,7 +32,7 @@ class CreateTriggersCallbackTest {
             val logRetrieved = retrievedLogs[i]
             val logExpected = logsWithIds[logsWithIds.lastIndex - i]
 
-            if (logRetrieved.id != logExpected.id || logRetrieved.timeStamp != logExpected.timeStamp)
+            if (logRetrieved != logExpected)
                 fail("Wrong AirQualityLog was returned by dao.")
         }
     }
@@ -45,12 +45,12 @@ class CreateTriggersCallbackTest {
         for (log in logs) {
             dao.insertLog(log)
         }
-        val latestLogAsExpected = StationsUpdateLog(logs.size.toLong(), 0, logs.size -1L)
+        val latestLogAsExpected = StationsUpdateLog(logs.size.toLong(), 0, logs.size - 1L)
 
         val latestLog = dao.getLastLog()
         val numberOfLogsInDb = db.query(SimpleSQLiteQuery("SELECT * FROM stations_update_logs")).count
         assertEquals("db contained more logs than allowed", 1, numberOfLogsInDb)
-        if(latestLog != latestLogAsExpected) fail("stationsUpdateLog returned was not the latest log!")
+        if (latestLog != latestLogAsExpected) fail("stationsUpdateLog returned was not the latest log!")
     }
 
     private fun prepareNewDataBase(): AppDatabase {

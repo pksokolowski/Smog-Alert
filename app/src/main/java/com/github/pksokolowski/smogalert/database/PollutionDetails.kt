@@ -2,6 +2,7 @@ package com.github.pksokolowski.smogalert.database
 
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import java.lang.RuntimeException
+import java.util.*
 
 class PollutionDetails {
     private val pollutionData: Array<Int>
@@ -98,5 +99,20 @@ class PollutionDetails {
 
     override fun toString(): String {
         return pollutionData.joinToString(prefix = "[", postfix = "]")
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PollutionDetails
+
+        if (!Arrays.equals(pollutionData, other.pollutionData)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return Arrays.hashCode(pollutionData)
     }
 }
