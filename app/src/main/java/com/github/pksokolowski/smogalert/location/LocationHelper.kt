@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @PerApp
-class LocationHelper @Inject constructor(appContext: Application, private val availabilityHelper: LocationAvailabilityHelper) {
+class LocationHelper @Inject constructor(private val context: Application, private val availabilityHelper: LocationAvailabilityHelper) {
 
     private val fusedLocationClient: FusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(appContext)
+            LocationServices.getFusedLocationProviderClient(context)
 
     class LocationResult(val location: Location?, val errorCode: Int)
 
@@ -31,7 +31,10 @@ class LocationHelper @Inject constructor(appContext: Application, private val av
         val task = fusedLocationClient.lastLocation
 
         return try {
-            val location = Tasks.await(task, 5000, TimeUnit.MILLISECONDS)
+            var location = Tasks.await(task, 5000, TimeUnit.MILLISECONDS)
+
+            if (location == null) location = ActiveLocationRequestHelper.getLocation(context)
+
             val resultStatus = if (location != null) SUCCESS else UNKNOWN_ERROR
             LocationResult(location, resultStatus)
         } catch (e: java.util.concurrent.TimeoutException) {
