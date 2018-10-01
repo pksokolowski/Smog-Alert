@@ -17,7 +17,13 @@ class ErrorExplanationHelper {
     companion object {
         fun explain(log: AirQualityLog, context: Context): String {
             if (log.airQualityIndex == -1 && log.errorCode == ERROR_CODE_SUCCESS) {
-                return context.getString(R.string.error_explanation_server)
+                val highestSubIndex = log.details.getHighestIndex()
+                return if (highestSubIndex > -1) {
+                    // partial data case
+                    val possibleIndexTitle = AirQualityIndexHelper.getTitle(highestSubIndex, context)
+                    context.getString(R.string.error_explanation_partial_data, possibleIndexTitle)
+                }
+                else context.getString(R.string.error_explanation_server)
             }
 
             return when (log.errorCode) {
