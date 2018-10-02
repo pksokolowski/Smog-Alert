@@ -17,8 +17,15 @@ data class Station(
         val latitude: Double,
 
         @ColumnInfo(name = "longitude")
-        val longitude: Double
+        val longitude: Double,
+
+        @ColumnInfo(name = "absence_count")
+        val absenceCount: Int = 0
 ) {
     fun assignSensors(sensorFlags: Int) =
-            Station(id, sensorFlags, latitude, longitude)
+            Station(id, sensorFlags, latitude, longitude, absenceCount)
+
+    fun incrementAbsenceCount() =
+            Station(id, sensorFlags, latitude, longitude, absenceCount + 1)
+
 }

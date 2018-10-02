@@ -132,9 +132,17 @@ class StationsRepositoryTest {
     @Test
     fun removesStationsCorrectly() {
         val size = 151
+        val deletedItemsCount = 5
+        // prepare deletions
+        val sample = getSampleStationsList(size)
+        for (i in 0 until deletedItemsCount) {
+            val longAbsentStation = Station(1000L + i, 0, 50.0, 20.0, EXPECTED_MAX_ABSENCE_COUNT_BEFORE_DELETION)
+            sample.add(longAbsentStation)
+        }
+
         val data = prepareFreshRepository(
-                getSampleStationsList(size).randomlySwapItems(40, 1),
-                getSampleStationsList(size - 5).randomlySwapItems(60, 2)
+                sample.randomlySwapItems(40, 1),
+                getSampleStationsList(size).randomlySwapItems(60, 2)
         )
 
         val stations = data.repo.getStations()
@@ -148,10 +156,45 @@ class StationsRepositoryTest {
     }
 
     @Test
+    fun removesStationsCorrectlyButNotTheOnesOnlyRecentlyAbsent() {
+        val size = 151
+        val deletedItemsCount = 5
+        val temporarilyAbsentItemsCount = 4
+        // prepare deletions
+        val sample = getSampleStationsList(size)
+        for (i in 0 until deletedItemsCount) {
+            val longAbsentStation = Station(1000L + i, 0, 50.0, 20.0, EXPECTED_MAX_ABSENCE_COUNT_BEFORE_DELETION)
+            sample.add(longAbsentStation)
+        }
+        for (i in 0 until temporarilyAbsentItemsCount) {
+            val longAbsentStation = Station(1000L + i, 0, 50.0, 20.0, EXPECTED_MAX_ABSENCE_COUNT_BEFORE_DELETION - 1)
+            sample.add(longAbsentStation)
+        }
+
+        val data = prepareFreshRepository(
+                sample.randomlySwapItems(40, 1),
+                getSampleStationsList(size).randomlySwapItems(60, 2)
+        )
+
+        val stations = data.repo.getStations()
+
+        assertArrayEquals("should have returned the list from API", data.online.toTypedArray(), stations.toTypedArray())
+        assertEquals(deletedItemsCount, data.dao.mDeletedStationsCount)
+        assertEquals(0, data.dao.mInsertedStationsCount)
+        assertEquals(temporarilyAbsentItemsCount, data.dao.mUpdatedStationsCount)
+
+        assertEquals("should have used api service", 1, data.service.mStationsRequestsCount)
+    }
+
+    @Test
     fun combinesAddRemoveAndUpdateCorrectly() {
         val size = 151
         val cached = getSampleStationsList(size)
-        val api = getSampleStationsList(size - 15)
+        for (i in 0 until 15) {
+            val longAbsentStation = Station(1000L + i, 0, 50.0, 20.0, EXPECTED_MAX_ABSENCE_COUNT_BEFORE_DELETION)
+            cached.add(longAbsentStation)
+        }
+        val api = getSampleStationsList(size)
 
         //add new stations
         api.addAll(listOf(Station(405, 0, 47.123, 19.321),
@@ -459,6 +502,8 @@ class StationsRepositoryTest {
                 SensorsPresence.FLAG_SENSOR_C6H6 to 10,
                 SensorsPresence.FLAG_SENSOR_CO to 8
         )
+
+        const val EXPECTED_MAX_ABSENCE_COUNT_BEFORE_DELETION = 6
     }
 
 }

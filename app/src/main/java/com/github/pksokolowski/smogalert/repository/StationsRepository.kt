@@ -96,7 +96,13 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
         // find stations to delete
         stationsFromDb.forEach {
             if (!apiStationsMap.containsKey(it.id)) {
-                toDelete.add(it)
+                val incremented = it.incrementAbsenceCount()
+
+                if (incremented.absenceCount > MAX_ABSENCE_COUNT_BEFORE_DELETION) {
+                    toDelete.add(it)
+                } else {
+                    toUpdate.add(incremented)
+                }
             }
         }
 
@@ -143,10 +149,11 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
     private companion object {
         const val SUCCESS = 0
         const val FAILURE = 1
-        private const val DAY_IN_MILLIS = 86400000L
-        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE = 3 * DAY_IN_MILLIS
+        const val DAY_IN_MILLIS = 86400000L
+        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE = DAY_IN_MILLIS
         const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE = 30 * 60000L - 1
-        const val CACHE_UPDATE_INTERVAL_AFTER_SUCCESS = 30 * DAY_IN_MILLIS
+        const val CACHE_UPDATE_INTERVAL_AFTER_SUCCESS = DAY_IN_MILLIS
+        const val MAX_ABSENCE_COUNT_BEFORE_DELETION = 6
     }
 
     private class UpdateOperationResult(val status: Int, val stations: List<Station>)
