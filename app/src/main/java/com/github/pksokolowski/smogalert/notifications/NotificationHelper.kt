@@ -63,6 +63,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
                 .setLights(Color.YELLOW, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
+                .setContentIntent(getOpenMainActivityPendingIntent(context))
                 .setAutoCancel(true)
 
         val notification = b.build()
