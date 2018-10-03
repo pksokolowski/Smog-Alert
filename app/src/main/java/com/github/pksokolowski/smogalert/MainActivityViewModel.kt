@@ -15,8 +15,7 @@ import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(private val context: Application,
                                                 private val airQualityLogsRepository: AirQualityLogsRepository,
-                                                private val jobsHelper: JobsHelper,
-                                                private val locationAvailabilityHelper: LocationAvailabilityHelper) : ViewModel() {
+                                                private val jobsHelper: JobsHelper) : ViewModel() {
 
     private val airQualityInfo = airQualityLogsRepository.getCachedLog()
     private val isDownloadInProgress = MutableLiveData<Boolean>()
@@ -28,8 +27,6 @@ class MainActivityViewModel @Inject constructor(private val context: Application
     fun getSensitivity() = sensitivity as LiveData<Int>
 
     fun checkCurrentAirQuality() {
-        if (!locationAvailabilityHelper.checkOverallAvailability()) return
-
         val task = AirQualityDataFetcher(airQualityLogsRepository, jobsHelper, isDownloadInProgress)
         task.execute()
     }
