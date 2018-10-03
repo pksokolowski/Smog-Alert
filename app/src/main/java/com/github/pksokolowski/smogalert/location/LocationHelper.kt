@@ -36,7 +36,7 @@ class LocationHelper @Inject constructor(private val context: Application, priva
             var location = Tasks.await(task, 5000, TimeUnit.MILLISECONDS)
 
             if (location == null
-                    || SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos > 10 * MINUTE_IN_NANOS) {
+                    || SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos > MAX_LOCATION_FIX_AGE_IN_NANOS) {
                 usedActiveMethod = true
                 location = ActiveLocationRequestHelper.getLocation(context)
             }
@@ -59,6 +59,6 @@ class LocationHelper @Inject constructor(private val context: Application, priva
         const val GOOGLE_LOCATION_API_IS_UNAVAILABLE = 5
         const val TIMEOUT = 6
 
-        const val MINUTE_IN_NANOS = 60 * 1000000000L
+        const val MAX_LOCATION_FIX_AGE_IN_NANOS = 10 * (60 * 1000000000L) /* 10  * (minuta) */
     }
 }

@@ -7,13 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.SystemClock
 import android.support.v4.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ActiveLocationRequestHelper : BroadcastReceiver() {
@@ -22,20 +22,26 @@ class ActiveLocationRequestHelper : BroadcastReceiver() {
         if (intent.action == ACTION_PROCESS_UPDATES) {
             val result = LocationResult.extractResult(intent)
                     ?: return
-            lastActivelyFetchedLocation = result.lastLocation
-            isLocationReady = true
+            synchronized(lock) {
+                lastActivelyFetchedLocation = result.lastLocation
+                isLocationReady = true
+                lock.notifyAll()
+            }
         }
     }
 
     companion object {
         const val ACTION_PROCESS_UPDATES = "com.github.pksokolowski.smogalert.action_process_location_update"
+        const val TIMEOUT_MILLIS = 20000L /* 20 seconds */
 
         @Volatile
+        private var lastActivelyFetchedLocation: Location? = null
         private var isLocationReady: Boolean = false
 
-        private var lastActivelyFetchedLocation: Location? = null
+        private val lock = java.lang.Object()
 
-        fun getLocation(context: Context): Location? {
+        fun getLocation(context: Context): Location? = synchronized(lock) {
+            lastActivelyFetchedLocation = null
             isLocationReady = false
 
             // check permission
@@ -53,7 +59,7 @@ class ActiveLocationRequestHelper : BroadcastReceiver() {
                 // responses for subsequent requests in testing.
                 fastestInterval = 1
                 numUpdates = 1
-                setExpirationDuration(20000 /* 20 sec */)
+                setExpirationDuration(TIMEOUT_MILLIS)
             }
             val task = fusedLocationClient.requestLocationUpdates(
                     mLocationRequest,
@@ -65,13 +71,15 @@ class ActiveLocationRequestHelper : BroadcastReceiver() {
                 return null
             }
 
-            // busy waiting
-            val timeStampBefore = Calendar.getInstance().timeInMillis
-            while (!isLocationReady && Calendar.getInstance().timeInMillis - timeStampBefore < 22000) {
-                Thread.sleep(1000)
+            var timeLeft = TIMEOUT_MILLIS
+            val startTime = SystemClock.elapsedRealtime()
+            while (!isLocationReady && timeLeft > 0) {
+                lock.wait(timeLeft)
+                val now = SystemClock.elapsedRealtime()
+                timeLeft = TIMEOUT_MILLIS - (now - startTime)
             }
 
-            return if (isLocationReady) lastActivelyFetchedLocation else null
+            return lastActivelyFetchedLocation
         }
 
         private fun getPendingIntent(context: Context): PendingIntent {
