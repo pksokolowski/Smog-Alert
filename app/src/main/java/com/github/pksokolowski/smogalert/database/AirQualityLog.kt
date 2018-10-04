@@ -61,6 +61,7 @@ data class AirQualityLog(
         const val ERROR_CODE_AIR_QUALITY_MISSING = 5
 
         const val FLAG_USED_API = 1
+        const val FLAG_USED_ACTIVE_LOCATION_METHOD = 2
     }
 
 }

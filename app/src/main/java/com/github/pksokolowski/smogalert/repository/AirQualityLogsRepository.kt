@@ -10,6 +10,7 @@ import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.ERROR_CODE_SUCCESS
+import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_USED_ACTIVE_LOCATION_METHOD
 import com.github.pksokolowski.smogalert.database.AirQualityLog.Companion.FLAG_USED_API
 import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
 import com.github.pksokolowski.smogalert.database.PollutionDetails
@@ -56,27 +57,30 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     private fun fetchFreshLog(timeStamp: Long): AirQualityLog {
+        var flags = 0
         if (!connectionChecker.isConnectionAvailable()) {
             return AirQualityLog(errorCode = ERROR_CODE_NO_INTERNET,
-                    timeStamp = timeStamp)
+                    timeStamp = timeStamp, metadata = flags)
         }
 
-        val location = locationHelper.getLastLocationData().location
+        val locationResult = locationHelper.getLastLocationData()
+        if(locationResult.activeMethodEmployed) flags = flags or FLAG_USED_ACTIVE_LOCATION_METHOD
+        val location = locationResult.location
                 ?: return AirQualityLog(errorCode = ERROR_CODE_LOCATION_MISSING,
-                        timeStamp = timeStamp)
+                        timeStamp = timeStamp, metadata = flags)
 
         val stations = getNearestStationsIDs(location)
                 ?: return AirQualityLog(errorCode = ERROR_CODE_NO_KNOWN_STATIONS,
-                        timeStamp = timeStamp)
+                        timeStamp = timeStamp, metadata = flags)
         if (stations.isEmpty()) {
             return AirQualityLog(errorCode = ERROR_CODE_STATIONS_TOO_FAR_AWAY,
-                    timeStamp = timeStamp)
+                    timeStamp = timeStamp, metadata = flags)
         }
 
         var details = PollutionDetails()
         var gainedCoverage = SensorsPresence()
         var expectedCoverage = SensorsPresence()
-        var flags = FLAG_USED_API
+        flags = flags or FLAG_USED_API
         var passes = 0
 
         for (s in stations) {
