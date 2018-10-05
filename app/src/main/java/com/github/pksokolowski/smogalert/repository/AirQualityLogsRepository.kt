@@ -166,6 +166,6 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         const val ACCEPTABLE_LOG_AGE = 30 * 60000 - 1
         const val ACCEPTABLE_DISTANCE_TO_STATION = 10000F
 
-        const val MAX_STATION_REQUESTS = 4
+        const val MAX_STATION_REQUESTS = 10
     }
 }
