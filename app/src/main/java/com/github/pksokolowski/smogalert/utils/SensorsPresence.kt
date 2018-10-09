@@ -14,7 +14,7 @@ data class SensorsPresence(private val sensorFlags: Int = 0) {
 
     companion object {
 
-        fun containsSensors(container: Int, sensors: Int) = container and sensors != 0
+        fun containsSensors(container: Int, sensors: Int) = container and sensors == sensors
 
         fun combineSensors(A: Int, B: Int) = A or B
 
