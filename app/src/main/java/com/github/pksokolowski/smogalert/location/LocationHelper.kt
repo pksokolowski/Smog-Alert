@@ -59,6 +59,6 @@ class LocationHelper @Inject constructor(private val context: Application, priva
         const val GOOGLE_LOCATION_API_IS_UNAVAILABLE = 5
         const val TIMEOUT = 6
 
-        const val MAX_LOCATION_FIX_AGE_IN_NANOS = 10 * (60 * 1000000000L) /* 10  * (minuta) */
+        const val MAX_LOCATION_FIX_AGE_IN_NANOS = 10 * (60 * 1000000000L) /* 10  * (a minute) */
     }
 }

@@ -31,8 +31,8 @@ class ActiveLocationRequestHelper : BroadcastReceiver() {
     }
 
     companion object {
-        const val ACTION_PROCESS_UPDATES = "com.github.pksokolowski.smogalert.action_process_location_update"
-        const val TIMEOUT_MILLIS = 20000L /* 20 seconds */
+        private const val ACTION_PROCESS_UPDATES = "com.github.pksokolowski.smogalert.action_process_location_update"
+        private const val TIMEOUT_MILLIS = 20000L /* 20 seconds */
 
         @Volatile
         private var lastActivelyFetchedLocation: Location? = null

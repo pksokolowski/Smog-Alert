@@ -11,4 +11,5 @@
 .externalNativeBuild
 /.idea/caches/build_file_checksums.ser
 /app/local
+/app/debugTool
 /app/standard

@@ -69,7 +69,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                 ?: return AirQualityLog(errorCode = ERROR_CODE_LOCATION_MISSING,
                         timeStamp = timeStamp, metadata = flags)
 
-        val stations = getNearestStationsIDs(location)
+        val stations = getNearestStations(location)
                 ?: return AirQualityLog(errorCode = ERROR_CODE_NO_KNOWN_STATIONS,
                         timeStamp = timeStamp, metadata = flags)
         if (stations.isEmpty()) {
@@ -137,7 +137,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                 timeStamp)
     }
 
-    private fun getNearestStationsIDs(location: Location): List<Station>? {
+    private fun getNearestStations(location: Location): List<Station>? {
         val stations = stationsRepository.getStations()
         if (stations.isEmpty()) return null
 
