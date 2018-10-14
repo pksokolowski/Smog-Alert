@@ -32,6 +32,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
 
     class LogData(val log: AirQualityLog, val isFromCache: Boolean)
 
+    @Synchronized
     fun getLatestLogData(): LogData {
         val timeNow = Calendar.getInstance().timeInMillis
         val latestCachedLog = airQualityLogsDao.getLatestAirQualityLog()
