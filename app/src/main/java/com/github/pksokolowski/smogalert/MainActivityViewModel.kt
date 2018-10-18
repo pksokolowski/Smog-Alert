@@ -8,7 +8,6 @@ import android.os.AsyncTask
 import android.widget.Toast
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
-import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
 import javax.inject.Inject

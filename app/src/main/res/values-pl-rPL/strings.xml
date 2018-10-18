@@ -12,8 +12,8 @@
     <string name="notification_alerts_message">Jakość powietrza pogorszyła się</string>
     <string name="notification_improvement_message">Jakość powietrza poprawiła się</string>
     <string name="notification_data_shortage_message">Brak danych o jakości powietrza</string>
-    <string name="notification_data_shortage_over_air_ok_message">Zanieczyszczenie powietrza poniżej poziomu ostrzegania</string>
-    <string name="notification_error_message">Wystąpił błąd. Dotknij aby otworzyć aplikację</string>
+    <string name="notification_data_shortage_over_air_ok_message">Powietrze jest akceptowalne</string>
+    <string name="notification_error_message">Wystąpił błąd</string>
 
     <string name="error_explanation_partial_data">Prawdopodobnie %s ale dane są niepełne</string>
     <string name="error_explanation_server">Brak danych na serverze</string>
@@ -45,10 +45,10 @@
     </array>
 
     <array name="sensitivity_level_descriptions">
-        <item>Ostrzeganie o smogu jest wyłączone. Przesuń suwak poniżej aby uruchomić ostrzeganie.</item>
+        <item>Ostrzeganie o smogu jest wyłączone. Aby otrzymywać powiadomienia, gdy jakość powietrza spadnie do danego poziomu, wybierz ten poziom przesuwając suwak poniżej.</item>
         <item>Zaleca się unikanie przebywania na powietrzu, w szczególności odradza się podejmowania tam aktywności fizycznej.</item>
         <item>Zaleca się rozważenie ograniczenia czasu spędzonego na powietrzu, zwłaszcza jeżeli w grę wchodzi aktywność fizyczna.</item>
-        <item>Jakość powietrza jest akceptowalna, nie ma jednoznacznych zaleceń w sprawie przebywania na zewnątrz, nawet w ramach aktywności fizycznej. Niemniej zwraca się uwagę, że nadal może to być szkodliwe dla zdrowia.</item>
+        <item>Jakość powietrza jest akceptowalna, nie ma jednoznacznych zaleceń w sprawie przebywania na zewnątrz, nawet w ramach aktywności fizycznej. Niemniej zwraca się uwagę, że nadal może to być niekorzystne dla zdrowia.</item>
         <item>błąd</item>
     </array>
 </resources>
