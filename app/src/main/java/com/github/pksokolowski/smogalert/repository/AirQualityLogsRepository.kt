@@ -91,9 +91,8 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                 stationsRepository.fetchSensorsData(s.id)?.sensorFlags ?: continue
             }
 
-            val expectedCoverageWithSIncluded = expectedCoverage.combinedWith(sensors)
-            if (expectedCoverageWithSIncluded == expectedCoverage) continue
-            expectedCoverage = expectedCoverageWithSIncluded
+            if (gainedCoverage.hasSensors(sensors)) continue
+            expectedCoverage = expectedCoverage.combinedWith(sensors)
 
             val log = getLogFromAPI(s.id, timeStamp)
             val logsSensorCoverage = log.details.getSensorCoverage()
