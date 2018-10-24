@@ -19,7 +19,7 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SE
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import okhttp3.Request
 import org.junit.Test
 import org.mockito.Mockito

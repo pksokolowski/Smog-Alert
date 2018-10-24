@@ -22,7 +22,7 @@ class AirQualityCheckJobService : JobService() {
     @Inject
     lateinit var notificationHelper: NotificationHelper
 
-    var task: AsyncTask<Void, Void, LogsData>? = null
+    private var task: AsyncTask<Void, Void, LogsData>? = null
 
     override fun onCreate() {
         AndroidInjection.inject(this)

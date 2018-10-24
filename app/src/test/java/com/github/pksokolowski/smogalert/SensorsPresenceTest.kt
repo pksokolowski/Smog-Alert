@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.fail
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Test
 
 class SensorsPresenceTest {

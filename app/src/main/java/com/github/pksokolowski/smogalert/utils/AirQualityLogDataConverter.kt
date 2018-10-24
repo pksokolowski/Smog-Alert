@@ -7,8 +7,6 @@ import com.github.pksokolowski.smogalert.database.PollutionDetails
 class AirQualityLogDataConverter {
     companion object {
         fun toAirQualityLog(model: AirQualityModel, stationId: Long, timeStamp: Long): AirQualityLog {
-            var sensors = 0
-
             val details = PollutionDetails(
                     model.pm10?.value ?: -1,
                     model.pm25?.value ?: -1,
@@ -27,7 +25,7 @@ class AirQualityLogDataConverter {
                     stationId,
                     AirQualityLog.ERROR_CODE_SUCCESS,
                     timeStamp,
-                    sensors)
+                    0)
         }
     }
 }

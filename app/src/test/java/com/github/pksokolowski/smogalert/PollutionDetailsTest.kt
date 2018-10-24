@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.database.PollutionDetails
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.fail
+import org.junit.Assert.assertEquals
+import org.junit.Assert.fail
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 import java.lang.Exception

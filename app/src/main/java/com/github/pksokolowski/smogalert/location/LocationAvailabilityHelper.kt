@@ -21,7 +21,7 @@ import javax.inject.Inject
  * Helps with permissions acquisition, settings and google play services version checking.
  */
 @PerApp
-class LocationAvailabilityHelper @Inject constructor(private val appContext: Application) {
+class LocationAvailabilityHelper @Inject constructor(private val context: Application) {
 
     fun checkAvailabilityAndPromptUserIfNeeded(activity: AppCompatActivity) {
         // API must first be in place to prevent potential crashes if used in below methods
@@ -72,7 +72,7 @@ class LocationAvailabilityHelper @Inject constructor(private val appContext: App
     }
 
     fun checkLocationEnabled(): Boolean {
-        val locationSetting = Settings.Secure.getInt(appContext.contentResolver, Settings.Secure.LOCATION_MODE)
+        val locationSetting = Settings.Secure.getInt(context.contentResolver, Settings.Secure.LOCATION_MODE)
         return locationSetting != Settings.Secure.LOCATION_MODE_OFF
     }
 
@@ -80,7 +80,7 @@ class LocationAvailabilityHelper @Inject constructor(private val appContext: App
      * @param activity if set, the method will show a permission request dialog if needed.
      */
     fun checkLocationPermission(activity: AppCompatActivity? = null): Boolean {
-        if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             return true
         }
@@ -100,7 +100,7 @@ class LocationAvailabilityHelper @Inject constructor(private val appContext: App
      */
     fun checkGoogleApiAvailability(activity: AppCompatActivity? = null): Boolean {
         val apiAvailabilityChecker = GoogleApiAvailability.getInstance()
-        val resultCode = apiAvailabilityChecker.isGooglePlayServicesAvailable(appContext)
+        val resultCode = apiAvailabilityChecker.isGooglePlayServicesAvailable(context)
 
         if (resultCode == ConnectionResult.SUCCESS) return true
 
