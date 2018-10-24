@@ -1,19 +1,16 @@
 package com.github.pksokolowski.smogalert
 
-import android.app.Application
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
-import android.widget.Toast
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
 import javax.inject.Inject
 
-class MainActivityViewModel @Inject constructor(private val context: Application,
-                                                private val airQualityLogsRepository: AirQualityLogsRepository,
+class MainActivityViewModel @Inject constructor(private val airQualityLogsRepository: AirQualityLogsRepository,
                                                 private val jobsHelper: JobsHelper) : ViewModel() {
 
     private val airQualityInfo = airQualityLogsRepository.getCachedLog()
@@ -32,9 +29,7 @@ class MainActivityViewModel @Inject constructor(private val context: Application
 
     fun setSensitivity(sensitivity: Int) {
         val params = AirCheckParams(sensitivity)
-        if (!jobsHelper.scheduleAirQualityCheckJob(params)) {
-            Toast.makeText(context, "failed to schedule the job", Toast.LENGTH_LONG).show()
-        }
+        jobsHelper.scheduleAirQualityCheckJob(params)
         this.sensitivity.value = sensitivity
         checkCurrentAirQuality()
     }
