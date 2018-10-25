@@ -137,7 +137,11 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
                 return null
             }
 
-            val sensorsFlags = SensorsDataConverter.toSensorFlags(sensors) ?: return null
+            val sensorsFlags = SensorsDataConverter.toSensorFlags(sensors)
+            // was 0 and remains 0, nothing changed so don't save and don't return as if
+            // you had some results.
+            if (sensorsFlags == 0) return null
+
             val updatedStation = cachedVersion.assignSensors(sensorsFlags)
             stationsDao.updateStation(updatedStation)
 

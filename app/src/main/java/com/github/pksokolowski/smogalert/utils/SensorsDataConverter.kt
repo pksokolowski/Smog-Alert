@@ -11,7 +11,7 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SE
 
 class SensorsDataConverter {
     companion object {
-        fun toSensorFlags(sensors: List<SensorsModel>): Int? {
+        fun toSensorFlags(sensors: List<SensorsModel>): Int {
             var sensorFlags = 0
 
             for (s in sensors) {
