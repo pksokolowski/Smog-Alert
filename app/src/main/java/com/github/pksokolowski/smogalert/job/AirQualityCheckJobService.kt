@@ -76,8 +76,8 @@ class AirQualityCheckJobService : JobService() {
         }
         task = AirQualityCheckerTask(airQualityLogsRepository, notificationHelper)
 
-        task?.execute() ?: return true
-        return false
+        task?.execute() ?: return false
+        return true
     }
 
 
