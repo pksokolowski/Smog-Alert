@@ -47,19 +47,19 @@ class AirQualityCheckJobService : JobService() {
 
             override fun onPostExecute(data: LogsData) {
                 super.onPostExecute(data)
+
+                // if the latest log comes from cache, it is assumed that the user
+                // had already interacted with it, and it's old news by now.
                 if (data.isLatestFromCache) {
                     jobFinished(jobParams, false)
                     return
                 }
+
                 val current = data.logs.getOrNull(0)
-                if (current == null) {
-                    jobFinished(jobParams, false)
-                    return
-                }
                 val previous = data.logs.getOrNull(1)
-                val comparisonResult = AQLogsComparer.compare(current,
-                        previous,
-                        checkParams.getMinimumWarningIndexLevel())
+
+                val warningIndexLevel = checkParams.getMinimumWarningIndexLevel()
+                val comparisonResult = AQLogsComparer.compare(current, previous, warningIndexLevel)
 
                 when (comparisonResult) {
                     RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
