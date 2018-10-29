@@ -22,6 +22,9 @@ class AirQualityCheckJobService : JobService() {
     @Inject
     lateinit var notificationHelper: NotificationHelper
 
+    @Inject
+    lateinit var jobsHelper: JobsHelper
+
     private var task: AsyncTask<Void, Void, LogsData>? = null
 
     override fun onCreate() {
@@ -42,7 +45,7 @@ class AirQualityCheckJobService : JobService() {
             : AsyncTask<Void, Void, LogsData>() {
 
             override fun doInBackground(vararg p0: Void?): LogsData {
-                return airQualityLogsRepository.getNLatestLogs(2)
+                return airQualityLogsRepository.getNLatestLogs(3)
             }
 
             override fun onPostExecute(data: LogsData) {
@@ -59,15 +62,31 @@ class AirQualityCheckJobService : JobService() {
                 val previous = data.logs.getOrNull(1)
 
                 val warningIndexLevel = checkParams.getMinimumWarningIndexLevel()
-                val comparisonResult = AQLogsComparer.compare(current, previous, warningIndexLevel)
 
-                when (comparisonResult) {
-                    RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
-                    RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
-                    RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
-                    RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
-                    RESULT_ERROR_EMERGED -> notificationHelper.showError()
-                    else -> {
+                if (checkParams.isOneTimeRetry) {
+                    // do not reschedule the periodic job here, it would cancel this job immediately
+
+                    val third = data.logs.getOrNull(2)
+                    val comparisonResult = AQLogsComparer.compare(current, third, warningIndexLevel)
+                    when (comparisonResult) {
+                        RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
+                        RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
+                        RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
+                        RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
+                        RESULT_ERROR_EMERGED -> notificationHelper.showError()
+                        else -> {
+                        }
+                    }
+                } else {
+                    val comparisonResult = AQLogsComparer.compare(current, previous, warningIndexLevel)
+                    when (comparisonResult) {
+                        RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
+                        RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
+                        RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
+                        RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
+                        RESULT_ERROR_EMERGED -> jobsHelper.scheduleOneTimeRetry(checkParams.sensitivity)
+                        else -> {
+                        }
                     }
                 }
 

@@ -14,12 +14,17 @@ class JobsHelper @Inject constructor(private val context: Application) {
     private val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
     fun scheduleAirQualityCheckJob(airCheckParams: AirCheckParams): Boolean {
+        if(airCheckParams.isOneTimeRetry){
+            return scheduleOneTimeRetry(airCheckParams)
+        }
+        jobScheduler.cancel(RETRY_JOB_ID)
+
         if (airCheckParams.sensitivity == 0) {
-            jobScheduler.cancel(JOB_ID)
+            jobScheduler.cancel(PERIODIC_JOB_ID)
             return true
         }
 
-        val jobInfo = JobInfo.Builder(JOB_ID, ComponentName(context, AirQualityCheckJobService::class.java))
+        val jobInfo = JobInfo.Builder(PERIODIC_JOB_ID, ComponentName(context, AirQualityCheckJobService::class.java))
                 .setPeriodic(PERIOD, FLEX)
                 .setPersisted(true)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -30,8 +35,26 @@ class JobsHelper @Inject constructor(private val context: Application) {
         return result == RESULT_SUCCESS
     }
 
+    private fun scheduleOneTimeRetry(airCheckParams: AirCheckParams): Boolean{
+        val jobInfo = JobInfo.Builder(RETRY_JOB_ID, ComponentName(context, AirQualityCheckJobService::class.java))
+                .setPersisted(true)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setMinimumLatency(MIN_EXECUTION_DELAY_FOR_RETRY_JOB)
+                .setOverrideDeadline(MAX_EXECUTION_DELAY_FOR_RETRY_JOB)
+                .setExtras(airCheckParams.getExtras())
+                .build()
+
+        val result = jobScheduler.schedule(jobInfo)
+        return result == RESULT_SUCCESS
+    }
+
+    fun scheduleOneTimeRetry(sensitivity: Int): Boolean{
+        val retryParams = AirCheckParams(sensitivity, true)
+        return scheduleOneTimeRetry(retryParams)
+    }
+
     fun getAirCheckParams(): AirCheckParams {
-        val job = jobScheduler.getPendingJob(JOB_ID)
+        val job = jobScheduler.getPendingJob(PERIODIC_JOB_ID)
                 ?: return AirCheckParams(0)
 
         return AirCheckParams(job.extras)
@@ -44,9 +67,13 @@ class JobsHelper @Inject constructor(private val context: Application) {
     }
 
     private companion object {
-        const val JOB_ID = 0
+        const val PERIODIC_JOB_ID = 0
+        const val RETRY_JOB_ID = 1
 
         const val PERIOD = 60 * 60000L /* 1 hour */
         const val FLEX = 30 * 60000L /* 30 minutes */
+
+        const val MIN_EXECUTION_DELAY_FOR_RETRY_JOB = 11 * 60000L /* 11 minutes */
+        const val MAX_EXECUTION_DELAY_FOR_RETRY_JOB = 19 * 60000L /* 19 minutes */
     }
 }
