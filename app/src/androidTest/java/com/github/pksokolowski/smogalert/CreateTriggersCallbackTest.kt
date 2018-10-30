@@ -25,7 +25,7 @@ class CreateTriggersCallbackTest {
         }
 
         val retrievedLogs = dao.getNLatestLogs(logs.size)
-        assertEquals("db contained more logs than allowed", 2, retrievedLogs.size)
+        assertEquals("db contained more logs than allowed", 3, retrievedLogs.size)
 
         for (i in 0 until retrievedLogs.size) {
             // notice that the retrievedLogs are in reverse order, the latest is the first.
