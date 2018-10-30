@@ -21,7 +21,7 @@ class ErrorExplanationHelper {
                 return if (highestSubIndex > -1) {
                     // partial data case
                     val possibleIndexTitle = AirQualityIndexHelper.getTitle(highestSubIndex, context)
-                    context.getString(R.string.error_explanation_partial_data, possibleIndexTitle)
+                    context.getString(R.string.error_explanation_partial_data, possibleIndexTitle.toLowerCase())
                 }
                 else context.getString(R.string.error_explanation_server)
             }
