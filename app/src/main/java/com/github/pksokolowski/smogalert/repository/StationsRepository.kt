@@ -113,7 +113,7 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
             updateStations(toUpdate)
         }
 
-        return UpdateOperationResult(SUCCESS, stationsFromApi)
+        return UpdateOperationResult(SUCCESS, stationsDao.getStations())
     }
 
     private fun getStationsFromApi(): List<Station>? {

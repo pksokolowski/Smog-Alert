@@ -86,7 +86,7 @@ class StationsRepositoryTest {
         )
 
         val stations = data.repo.getStations()
-        assertArrayEquals(data.online.toTypedArray(), stations.toTypedArray())
+        assertArrayEquals(data.cached.toTypedArray(), stations.toTypedArray())
         assertEquals(0, data.dao.mDeletedStationsCount)
         assertEquals(0, data.dao.mInsertedStationsCount)
         assertEquals(0, data.dao.mUpdatedStationsCount)
@@ -98,12 +98,11 @@ class StationsRepositoryTest {
         val api = getSampleStationsList().randomlySwapItems(30, 55)
 
         // assign some random sensor to see if it's erased corectly
-        cached[2] = cached[2].assignSensors(128)
+        cached[2] = cached[2].assignSensors(127)
 
         val data = prepareFreshRepository(cached, api)
 
         val stations = data.repo.getStations()
-        assertArrayEquals(api.toTypedArray(), stations.toTypedArray())
         assertEquals(0, data.dao.mDeletedStationsCount)
         assertEquals(0, data.dao.mInsertedStationsCount)
         assertEquals(1, data.dao.mUpdatedStationsCount)
@@ -114,16 +113,37 @@ class StationsRepositoryTest {
     }
 
     @Test
+    fun returnsFullUpdatedListAfterCacheUpdateWhereOneStationWentAbsent() {
+        val cached = listOf(
+                Station(550, 31, 50.0, 20.001),
+                Station(530, 107, 50.0, 20.002)
+        )
+        val api = listOf(
+                Station(530, 107, 50.0, 20.002)
+        )
+
+        val data = prepareFreshRepository(cached, api)
+
+        val stations = data.repo.getStations()
+        assertEquals(2, stations.size)
+    }
+
+    @Test
     fun addsNewStationCorrectly() {
         val size = 151
+
+        val api = getSampleStationsList(size + 1)
+        val theAddedStation = api.last()
+
         val data = prepareFreshRepository(
                 getSampleStationsList(size).randomlySwapItems(40, 1),
-                getSampleStationsList(size + 1).randomlySwapItems(60, 2)
+                api.randomlySwapItems(60, 2)
         )
 
         val stations = data.repo.getStations()
 
-        assertArrayEquals("should have returned the list from API", data.online.toTypedArray(), stations.toTypedArray())
+        val count = stations.count { it == theAddedStation }
+        assertEquals("the new station was added exactly once, without duplication etc", 1, count)
         assertEquals(0, data.dao.mDeletedStationsCount)
         assertEquals(1, data.dao.mInsertedStationsCount)
         assertEquals(0, data.dao.mUpdatedStationsCount)
@@ -147,7 +167,6 @@ class StationsRepositoryTest {
 
         val stations = data.repo.getStations()
 
-        assertArrayEquals("should have returned the list from API", data.online.toTypedArray(), stations.toTypedArray())
         assertEquals(5, data.dao.mDeletedStationsCount)
         assertEquals(0, data.dao.mInsertedStationsCount)
         assertEquals(0, data.dao.mUpdatedStationsCount)
@@ -178,7 +197,6 @@ class StationsRepositoryTest {
 
         val stations = data.repo.getStations()
 
-        assertArrayEquals("should have returned the list from API", data.online.toTypedArray(), stations.toTypedArray())
         assertEquals(deletedItemsCount, data.dao.mDeletedStationsCount)
         assertEquals(0, data.dao.mInsertedStationsCount)
         assertEquals(temporarilyAbsentItemsCount, data.dao.mUpdatedStationsCount)
@@ -203,14 +221,11 @@ class StationsRepositoryTest {
         // modify stations
         api[32] = Station(api[32].id, 0, 51.53, 20.21)
 
-        cached.randomlySwapItems(40, 1)
-        api.randomlySwapItems(60, 2)
-
         val data = prepareFreshRepository(cached, api)
 
         val stations = data.repo.getStations()
 
-        assertArrayEquals("should have returned the list from API", api.toTypedArray(), stations.toTypedArray())
+        assertArrayEquals(api.toTypedArray(), stations.toTypedArray())
         assertEquals(15, data.dao.mDeletedStationsCount)
         assertEquals(2, data.dao.mInsertedStationsCount)
         assertEquals(1, data.dao.mUpdatedStationsCount)
@@ -225,14 +240,15 @@ class StationsRepositoryTest {
                 getSampleStationsList()
         )
 
-        val stations = data.repo.getStations()
+        data.repo.getStations()
         assertEquals("should have used api service", 1, data.service.mStationsRequestsCount)
-        assertEquals("should have used cache for comparison", 1, data.dao.mStationsRequestsCount)
+        assertEquals("should have used cache twice by now, for comparison and in the end of getStations()", 2, data.dao.mStationsRequestsCount)
 
         // second call should use cache instead of API, because cache is presumably up to date now.
-        val stationsFromCache = data.repo.getStations()
+        // this means 3 uses of cache, because it was used twice in the previous case
+        data.repo.getStations()
         assertEquals("should not use API secondTime!", 1, data.service.mStationsRequestsCount)
-        assertEquals("should have used cache", 2, data.dao.mStationsRequestsCount)
+        assertEquals("should have used cache", 3, data.dao.mStationsRequestsCount)
 
     }
 
