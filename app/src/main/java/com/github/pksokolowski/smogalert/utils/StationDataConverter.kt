@@ -1,7 +1,7 @@
 package com.github.pksokolowski.smogalert.utils
 
-import com.github.pksokolowski.smogalert.airquality.models.StationModel
-import com.github.pksokolowski.smogalert.database.Station
+import com.github.pksokolowski.smogalert.api.models.StationModel
+import com.github.pksokolowski.smogalert.db.Station
 import java.lang.Exception
 
 /**

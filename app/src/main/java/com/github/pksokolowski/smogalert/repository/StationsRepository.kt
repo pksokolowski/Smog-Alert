@@ -1,14 +1,14 @@
 package com.github.pksokolowski.smogalert.repository
 
-import com.github.pksokolowski.smogalert.airquality.SensorsService
-import com.github.pksokolowski.smogalert.airquality.StationsService
-import com.github.pksokolowski.smogalert.database.Station
-import com.github.pksokolowski.smogalert.database.StationsDao
-import com.github.pksokolowski.smogalert.database.StationsUpdateLog
-import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_FAILURE_POSTPONED
-import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_FAILURE_RETRY_SOON
-import com.github.pksokolowski.smogalert.database.StationsUpdateLog.Companion.STATUS_SUCCESS
-import com.github.pksokolowski.smogalert.database.StationsUpdateLogsDao
+import com.github.pksokolowski.smogalert.api.SensorsService
+import com.github.pksokolowski.smogalert.api.StationsService
+import com.github.pksokolowski.smogalert.db.Station
+import com.github.pksokolowski.smogalert.db.StationsDao
+import com.github.pksokolowski.smogalert.db.StationsUpdateLog
+import com.github.pksokolowski.smogalert.db.StationsUpdateLog.Companion.STATUS_FAILURE_POSTPONED
+import com.github.pksokolowski.smogalert.db.StationsUpdateLog.Companion.STATUS_FAILURE_RETRY_SOON
+import com.github.pksokolowski.smogalert.db.StationsUpdateLog.Companion.STATUS_SUCCESS
+import com.github.pksokolowski.smogalert.db.StationsUpdateLogsDao
 import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.utils.SensorsDataConverter
 import com.github.pksokolowski.smogalert.utils.StationDataConverter

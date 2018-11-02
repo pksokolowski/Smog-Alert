@@ -1,4 +1,4 @@
-package com.github.pksokolowski.smogalert.airquality.models
+package com.github.pksokolowski.smogalert.api.models
 
 
 import com.google.gson.annotations.Expose

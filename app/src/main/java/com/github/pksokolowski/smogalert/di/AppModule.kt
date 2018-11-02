@@ -2,7 +2,7 @@ package com.github.pksokolowski.smogalert.di
 
 import android.app.Application
 import android.arch.persistence.room.Room
-import com.github.pksokolowski.smogalert.database.*
+import com.github.pksokolowski.smogalert.db.*
 import com.github.pksokolowski.smogalert.utils.DATABASE_NAME
 import dagger.Module
 import dagger.Provides

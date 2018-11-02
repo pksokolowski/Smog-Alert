@@ -1,4 +1,4 @@
-package com.github.pksokolowski.smogalert.database
+package com.github.pksokolowski.smogalert.db
 
 import android.arch.persistence.room.TypeConverter
 

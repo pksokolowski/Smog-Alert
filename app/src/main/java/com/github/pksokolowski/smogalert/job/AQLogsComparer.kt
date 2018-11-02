@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert.job
 
-import com.github.pksokolowski.smogalert.database.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog
 
 class AQLogsComparer {
     companion object {

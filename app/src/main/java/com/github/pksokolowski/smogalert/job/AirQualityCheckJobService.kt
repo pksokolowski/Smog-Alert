@@ -3,7 +3,7 @@ package com.github.pksokolowski.smogalert.job
 import android.app.job.JobParameters
 import android.app.job.JobService
 import android.os.AsyncTask
-import com.github.pksokolowski.smogalert.database.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DATA_SHORTAGE_STARTED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DEGRADED_PAST_THRESHOLD
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_ERROR_EMERGED

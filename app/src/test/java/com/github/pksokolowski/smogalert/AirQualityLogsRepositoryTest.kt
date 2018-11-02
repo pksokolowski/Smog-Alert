@@ -2,12 +2,12 @@ package com.github.pksokolowski.smogalert
 
 import android.arch.lifecycle.LiveData
 import android.location.Location
-import com.github.pksokolowski.smogalert.airquality.AirQualityService
-import com.github.pksokolowski.smogalert.airquality.models.AirQualityModel
-import com.github.pksokolowski.smogalert.database.AirQualityLog
-import com.github.pksokolowski.smogalert.database.AirQualityLogsDao
-import com.github.pksokolowski.smogalert.database.PollutionDetails
-import com.github.pksokolowski.smogalert.database.Station
+import com.github.pksokolowski.smogalert.api.AirQualityService
+import com.github.pksokolowski.smogalert.api.models.AirQualityModel
+import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLogsDao
+import com.github.pksokolowski.smogalert.db.PollutionDetails
+import com.github.pksokolowski.smogalert.db.Station
 import com.github.pksokolowski.smogalert.location.LocationHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.StationsRepository

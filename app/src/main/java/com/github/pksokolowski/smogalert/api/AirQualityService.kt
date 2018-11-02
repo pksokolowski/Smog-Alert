@@ -1,6 +1,6 @@
-package com.github.pksokolowski.smogalert.airquality
+package com.github.pksokolowski.smogalert.api
 
-import com.github.pksokolowski.smogalert.airquality.models.AirQualityModel
+import com.github.pksokolowski.smogalert.api.models.AirQualityModel
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path

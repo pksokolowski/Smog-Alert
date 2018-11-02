@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert.utils
 
-import com.github.pksokolowski.smogalert.airquality.models.AirQualityModel
-import com.github.pksokolowski.smogalert.database.AirQualityLog
-import com.github.pksokolowski.smogalert.database.PollutionDetails
+import com.github.pksokolowski.smogalert.api.models.AirQualityModel
+import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.PollutionDetails
 
 class AirQualityLogDataConverter {
     companion object {

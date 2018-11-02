@@ -4,7 +4,7 @@ import android.arch.persistence.db.SimpleSQLiteQuery
 import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import com.github.pksokolowski.smogalert.database.*
+import com.github.pksokolowski.smogalert.db.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test

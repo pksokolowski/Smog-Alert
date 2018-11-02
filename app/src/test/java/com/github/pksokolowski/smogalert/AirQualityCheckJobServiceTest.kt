@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert
 
 import android.app.job.JobParameters
-import com.github.pksokolowski.smogalert.database.AirQualityLog
-import com.github.pksokolowski.smogalert.database.PollutionDetails
+import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.AirQualityCheckJobService
 import com.github.pksokolowski.smogalert.job.JobsHelper

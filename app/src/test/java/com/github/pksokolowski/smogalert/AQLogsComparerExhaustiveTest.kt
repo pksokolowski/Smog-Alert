@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.AQLogsComparerExhaustiveTest.SimpleAQLogCategory.*
-import com.github.pksokolowski.smogalert.database.AirQualityLog
-import com.github.pksokolowski.smogalert.database.PollutionDetails
+import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AQLogsComparer
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DATA_SHORTAGE_STARTED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DEGRADED_PAST_THRESHOLD

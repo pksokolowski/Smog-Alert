@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert
 
-import com.github.pksokolowski.smogalert.database.PollutionDetails
+import com.github.pksokolowski.smogalert.db.PollutionDetails
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Assert.assertArrayEquals

@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert
 
-import com.github.pksokolowski.smogalert.airquality.models.SensorsModel
+import com.github.pksokolowski.smogalert.api.models.SensorsModel
 import com.github.pksokolowski.smogalert.utils.SensorsDataConverter
 import org.junit.Assert.assertEquals
 import org.junit.Test

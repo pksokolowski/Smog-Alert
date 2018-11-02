@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert.di
 
-import com.github.pksokolowski.smogalert.airquality.AirQualityService
-import com.github.pksokolowski.smogalert.airquality.SensorsService
-import com.github.pksokolowski.smogalert.airquality.StationsService
+import com.github.pksokolowski.smogalert.api.AirQualityService
+import com.github.pksokolowski.smogalert.api.SensorsService
+import com.github.pksokolowski.smogalert.api.StationsService
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit

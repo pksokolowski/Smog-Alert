@@ -1,8 +1,8 @@
 package com.github.pksokolowski.smogalert
 
-import com.github.pksokolowski.smogalert.airquality.models.AirQualityModel
-import com.github.pksokolowski.smogalert.database.PollutionDetails
-import com.github.pksokolowski.smogalert.database.PollutionDetails.Companion.NUMBER_OF_POSSIBLE_SENSORS
+import com.github.pksokolowski.smogalert.api.models.AirQualityModel
+import com.github.pksokolowski.smogalert.db.PollutionDetails
+import com.github.pksokolowski.smogalert.db.PollutionDetails.Companion.NUMBER_OF_POSSIBLE_SENSORS
 import com.github.pksokolowski.smogalert.utils.AirQualityLogDataConverter
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO

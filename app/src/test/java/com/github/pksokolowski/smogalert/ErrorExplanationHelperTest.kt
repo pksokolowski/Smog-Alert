@@ -2,8 +2,8 @@ package com.github.pksokolowski.smogalert
 
 import android.content.Context
 import android.content.res.Resources
-import com.github.pksokolowski.smogalert.database.AirQualityLog
-import com.github.pksokolowski.smogalert.database.PollutionDetails
+import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.utils.ErrorExplanationHelper
 import org.junit.Assert.assertEquals
 import org.junit.Before

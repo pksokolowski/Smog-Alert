@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert
 
-import com.github.pksokolowski.smogalert.database.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.job.AQLogsComparer
 import org.junit.Assert
 import org.junit.Test

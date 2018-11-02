@@ -1,4 +1,4 @@
-package com.github.pksokolowski.smogalert.database
+package com.github.pksokolowski.smogalert.db
 
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import java.lang.RuntimeException

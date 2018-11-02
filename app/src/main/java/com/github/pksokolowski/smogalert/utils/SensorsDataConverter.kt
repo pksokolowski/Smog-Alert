@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert.utils
 
-import com.github.pksokolowski.smogalert.airquality.models.SensorsModel
+import com.github.pksokolowski.smogalert.api.models.SensorsModel
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_NO2
