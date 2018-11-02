@@ -50,7 +50,7 @@ android {
 
 dependencies {
     def dagger_version = "2.17"
-    def room_version = "1.1.1"
+    def architecture_components_version = "1.1.1"
 
     implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android-support:$dagger_version"
@@ -58,11 +58,12 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
-    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation "android.arch.lifecycle:extensions:$architecture_components_version"
+    testImplementation "android.arch.core:core-testing:$architecture_components_version"
 
-    implementation "android.arch.persistence.room:runtime:$room_version"
-    kapt "android.arch.persistence.room:compiler:$room_version"
-    testImplementation "android.arch.persistence.room:testing:$room_version"
+    implementation "android.arch.persistence.room:runtime:$architecture_components_version"
+    kapt "android.arch.persistence.room:compiler:$architecture_components_version"
+    testImplementation "android.arch.persistence.room:testing:$architecture_components_version"
 
     implementation "com.google.android.gms:play-services-location:16.0.0"
     implementation "com.android.support:support-v4:28.0.0"
@@ -80,5 +81,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    testImplementation "org.mockito:mockito-core:2.1.0"
+    testImplementation "org.mockito:mockito-core:2.7.6"
 }
