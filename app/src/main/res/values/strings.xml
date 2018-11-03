@@ -15,6 +15,7 @@
     <string name="notification_error_message">An error occurred</string>
 
     <string name="error_explanation_partial_data">Possibly %s but only partial data is available</string>
+    <string name="error_explanation_partial_data_without_key_pollutants">Key data is missing. Might be %s but likely is worse</string>
     <string name="error_explanation_server">Server didn\'t have the data</string>
     <string name="error_explanation_internet">No internet access</string>
     <string name="error_explanation_location">Location wasn\'t available</string>
