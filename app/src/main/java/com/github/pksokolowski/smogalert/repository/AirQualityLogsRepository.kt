@@ -115,7 +115,8 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                 stations.first().id,
                 ERROR_CODE_SUCCESS,
                 timeStamp,
-                flags)
+                flags,
+                expectedCoverage)
     }
 
     private fun getLogFromAPI(stationId: Long, timeStamp: Long): AirQualityLog {

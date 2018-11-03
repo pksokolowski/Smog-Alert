@@ -3,6 +3,7 @@ package com.github.pksokolowski.smogalert.db
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 
 /*
  * Notice that nearestStationId is not marked as a foreign key here. This is intentional, done to prevent
@@ -41,16 +42,18 @@ data class AirQualityLog(
         val timeStamp: Long,
 
         @ColumnInfo(name = "metadata")
-        val metadata: Int = 0
+        val metadata: Int = 0,
 
+        @ColumnInfo(name = "expected_sensor_coverage")
+        val expectedSensorCoverage: SensorsPresence = SensorsPresence(0)
 ) {
     fun assignId(id: Long) =
-            AirQualityLog(id, airQualityIndex, details,  nearestStationId, errorCode, timeStamp, metadata)
+            AirQualityLog(id, airQualityIndex, details,  nearestStationId, errorCode, timeStamp, metadata, expectedSensorCoverage)
 
     fun hasFlag(flag: Int) = metadata and flag != 0
 
     fun addFlags(flags: Int) =
-            AirQualityLog(id, airQualityIndex, details, nearestStationId, errorCode, timeStamp, metadata or flags)
+            AirQualityLog(id, airQualityIndex, details, nearestStationId, errorCode, timeStamp, metadata or flags, expectedSensorCoverage)
 
     companion object {
         const val ERROR_CODE_SUCCESS = 0

@@ -1,6 +1,7 @@
 package com.github.pksokolowski.smogalert.db
 
 import android.arch.persistence.room.TypeConverter
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 
 class Converters {
     @TypeConverter
@@ -9,4 +10,11 @@ class Converters {
     @TypeConverter
     fun decodePollutionDetails(value: Int): PollutionDetails =
             PollutionDetails(value)
+
+    @TypeConverter
+    fun encodeSensorsPresence(sensorsPresence: SensorsPresence): Int = sensorsPresence.sensorFlags
+
+    @TypeConverter
+    fun decodeSensorsPresence(value: Int): SensorsPresence =
+            SensorsPresence(value)
 }

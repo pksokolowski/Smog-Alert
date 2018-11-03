@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert.utils
 
-data class SensorsPresence(private val sensorFlags: Int = 0) {
+data class SensorsPresence(val sensorFlags: Int = 0) {
 
     fun hasSensors(sensorFlags: Int) = containsSensors(this.sensorFlags, sensorFlags)
 
