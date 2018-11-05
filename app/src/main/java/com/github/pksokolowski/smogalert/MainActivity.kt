@@ -4,9 +4,11 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.SeekBar
+import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.location.LocationAvailabilityHelper
 import com.github.pksokolowski.smogalert.utils.AirQualityIndexHelper
 import com.github.pksokolowski.smogalert.utils.ErrorExplanationHelper
@@ -25,14 +27,15 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainActivityViewModel
 
+    private var isLocationAccessRequestPending = false
+
+    private val handler = Handler()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
-
-        locationAvailabilityHelper.checkAvailabilityAndPromptUserIfNeeded(this)
-
 
         viewModel.getAirQualityInfo().observe(this, Observer {
             if (it == null) return@Observer
@@ -43,6 +46,10 @@ class MainActivity : AppCompatActivity() {
             air_quality_textview.setTextColor(textColor)
 
             explanationTextView.text = ErrorExplanationHelper.explain(it, this)
+
+            if (it.errorCode == AirQualityLog.ERROR_CODE_LOCATION_MISSING) {
+                promptUserAboutLocationAccessIfMissing(it.id == 1L)
+            }
         })
 
         viewModel.getDownloadStatus().observe(this, Observer {
@@ -71,8 +78,25 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun promptUserAboutLocationAccessIfMissing(withoutDelay: Boolean) {
+        if (!isLocationAccessRequestPending) {
+            isLocationAccessRequestPending = true
+
+            handler.postDelayed({
+                locationAvailabilityHelper.checkAvailabilityAndPromptUserIfNeeded(this)
+                isLocationAccessRequestPending = false
+            }, if (withoutDelay) 0L else 5000L)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.checkCurrentAirQuality()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacksAndMessages(null)
+        isLocationAccessRequestPending = false
     }
 }
