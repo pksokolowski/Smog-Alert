@@ -5,6 +5,7 @@ import android.location.Location
 import com.github.pksokolowski.smogalert.api.AirQualityService
 import com.github.pksokolowski.smogalert.api.models.AirQualityModel
 import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_AIR_QUALITY_MISSING
 import com.github.pksokolowski.smogalert.db.AirQualityLogsDao
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.db.Station
@@ -59,6 +60,21 @@ class AirQualityLogsRepositoryTest {
     }
 
     @Test
+    fun returnsLogWithCorrectErrorWhenSensorsDataWasNotAvailableDueToConnectionOrServerIssues() {
+        val pack = MockPack(
+                mapOf(
+                        Station(1, 0, 50.0, 20.0) to makeLog(4499999)
+                )
+                ,
+                stationSensorsById = mapOf(
+                        1L to 0
+                ))
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals("didn't return correct error message when sensors weren't available", ERROR_CODE_AIR_QUALITY_MISSING, freshLog.errorCode)
+    }
+
+    @Test
     fun combinesDataFromMultipleStationsToFillPartialShortagesOnPreviousStations() {
         val pack = MockPack(
                 mapOf(
@@ -106,6 +122,52 @@ class AirQualityLogsRepositoryTest {
         assertEquals("cannot detect a partial data shortage", -1, freshLog.airQualityIndex)
     }
 
+    @Test
+    fun handlesConnectionErrorGracefully() {
+        val pack = MockPack(mapOf(
+                Station(1, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3, 50.0, 20.0) to makeLog(9999999, null, null)
+        ))
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals("did not assign a connection error correctly", ERROR_CODE_AIR_QUALITY_MISSING, freshLog.errorCode)
+    }
+
+    @Test
+    fun handlesConnectionErrorGracefullyWhenThereAreMoreStations() {
+        val pack = MockPack(mapOf(
+                Station(1, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3, 50.0, 20.0) to makeLog(9999999, null, null),
+                Station(2, FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_C6H6, 50.0, 20.001) to makeLog(9999999, null, null)
+        ))
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals("did not assign a connection error correctly", ERROR_CODE_AIR_QUALITY_MISSING, freshLog.errorCode)
+    }
+
+    @Test
+    fun handlesConnectionErrorGracefullyWhenThereAreMoreStationsAndOnlyOneGotError() {
+        val pack = MockPack(mapOf(
+                Station(1, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3, 50.0, 20.0) to makeLog(9999999, null, null),
+                Station(2, FLAG_SENSOR_CO, 50.0, 20.002) to makeLog(9999993)
+        ))
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals("did not assign a connection error correctly", AirQualityLog.ERROR_CODE_SUCCESS, freshLog.errorCode)
+    }
+
+    @Test
+    fun handlesConnectionErrorGracefullyWhenThereAreMoreStationsAndOneGotErrorButAllExpectedSensorsAreCovered() {
+        val pack = MockPack(mapOf(
+                Station(1, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3, 50.0, 20.0) to makeLog(9999999, null, null),
+                Station(2, FLAG_SENSOR_O3, 50.0, 20.002) to makeLog(9919999),
+                Station(3, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25, 50.0, 20.003) to makeLog(1199999)
+
+        ))
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals("did not get data despite only one station having error and being fully replaced by subsequent ones", 1, freshLog.airQualityIndex)
+        assertEquals("did not assign a connection error correctly", AirQualityLog.ERROR_CODE_SUCCESS, freshLog.errorCode)
+    }
+
     /**
      * takes encodedPollutionDetails Int and transforms it into pollution details. The encoded
      * Int format is comprised of 7 digits, each represents level of a subsequent pollutant/subindex
@@ -114,7 +176,7 @@ class AirQualityLogsRepositoryTest {
      *
      * For example 9000000 means that PM10 level is -1 and all the others are equal to 0.
      */
-    private fun makeLog(encodedPollutionDetails: Int): AirQualityModel {
+    private fun makeLog(encodedPollutionDetails: Int, stationId: Int? = 0, indexStatus: Boolean? = true): AirQualityModel {
         val details = PollutionDetails(encodedPollutionDetails)
         val levelValues = details.getDetailsArray()
         val indexLevels = Array(levelValues.size) {
@@ -122,6 +184,7 @@ class AirQualityLogsRepositoryTest {
         }
         return AirQualityModel().apply {
             indexLevel = getIndexLevel(details.getHighestIndex())
+            id = stationId
             pm10 = indexLevels[0]
             pm25 = indexLevels[1]
             o3 = indexLevels[2]
@@ -129,6 +192,7 @@ class AirQualityLogsRepositoryTest {
             so2 = indexLevels[4]
             c6h6 = indexLevels[5]
             co = indexLevels[6]
+            status = indexStatus
         }
     }
 
@@ -201,6 +265,7 @@ class AirQualityLogsRepositoryTest {
             val station = stationModelMap.keys.filter { it.id == id }.getOrElse(0) { return null }
             val sensors = stationSensorsById[station.id]
                     ?: throw RuntimeException("requested sensors for station which did not have any assigned")
+            if(sensors == 0) return null
             return station.assignSensors(sensors)
         }
 

@@ -1,6 +1,7 @@
 package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.api.models.AirQualityModel
+import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.db.PollutionDetails.Companion.NUMBER_OF_POSSIBLE_SENSORS
 import com.github.pksokolowski.smogalert.utils.AirQualityLogDataConverter
@@ -21,7 +22,7 @@ class AirQualityLogDataConverterTest {
     fun recognizesPollutants() {
         for (i in SENSORS.indices) {
             val subIndexes = Array(NUMBER_OF_POSSIBLE_SENSORS){ if(it == i) 0 else -1}
-            val model = getModel(subIndexes)
+            val model = getModel(subIndexes, 500, true)
             val log = AirQualityLogDataConverter.toAirQualityLog(model, 0, 0)
 
             val sensors = log.details.getSensorCoverage()
@@ -36,11 +37,18 @@ class AirQualityLogDataConverterTest {
 
     @Test
     fun recognizesWhenThereAreNoPollutantsCovered() {
-        val model = getModel(PollutionDetails())
+        val model = getModel(PollutionDetails(), indexStatus = false)
         val log = AirQualityLogDataConverter.toAirQualityLog(model, 0, 0)
         for (s in SENSORS) {
             if (log.hasFlag(s)) fail()
         }
+    }
+
+    @Test
+    fun recognizesWhenThereIsAnError() {
+        val model = getModel(PollutionDetails(), null, null)
+        val log = AirQualityLogDataConverter.toAirQualityLog(model, 0, 0)
+       assertEquals(AirQualityLog.ERROR_CODE_AIR_QUALITY_MISSING, log.errorCode)
     }
 
 //    @Test
@@ -68,13 +76,14 @@ class AirQualityLogDataConverterTest {
 //
 //    }
 
-    private fun getModel(pollutionDetails: PollutionDetails): AirQualityModel {
+    private fun getModel(pollutionDetails: PollutionDetails, stationId: Int? = 11, indexStatus: Boolean? = true): AirQualityModel {
         val subIndexes = pollutionDetails.getDetailsArray()
-        return getModel(subIndexes)
+        return getModel(subIndexes, stationId, indexStatus)
     }
 
-    private fun getModel(subIndexes: Array<Int>): AirQualityModel {
+    private fun getModel(subIndexes: Array<Int>, stationId: Int?, indexStatus: Boolean?): AirQualityModel {
         val model = AirQualityModel()
+        model.id = stationId
         model.pm10 = getIndexOfNull(subIndexes[0])
         model.pm25 = getIndexOfNull(subIndexes[1])
         model.o3 = getIndexOfNull(subIndexes[2])
@@ -82,6 +91,7 @@ class AirQualityLogDataConverterTest {
         model.so2 = getIndexOfNull(subIndexes[4])
         model.c6h6 = getIndexOfNull(subIndexes[5])
         model.co = getIndexOfNull(subIndexes[6])
+        model.status = indexStatus
         return model
     }
 

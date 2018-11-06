@@ -2,6 +2,8 @@ package com.github.pksokolowski.smogalert.utils
 
 import com.github.pksokolowski.smogalert.api.models.AirQualityModel
 import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_AIR_QUALITY_MISSING
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_SUCCESS
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 
 class AirQualityLogDataConverter {
@@ -19,11 +21,16 @@ class AirQualityLogDataConverter {
 
             val airQualityIndex = model.indexLevel?.value ?: -1
 
+            // "id" and "status" fields are always set, unless station doesn't exist or Retrofit didn't
+            // obtain any answer, like when connection is tearing, wifi failing or a bit out of range
+            val errorCode = if (model.id == null && model.status == null) ERROR_CODE_AIR_QUALITY_MISSING
+            else ERROR_CODE_SUCCESS
+
             return AirQualityLog(0,
                     airQualityIndex,
                     details,
                     stationId,
-                    AirQualityLog.ERROR_CODE_SUCCESS,
+                    errorCode,
                     timeStamp,
                     0)
         }

@@ -2,9 +2,13 @@ package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_NO2
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_O3
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
 import com.github.pksokolowski.smogalert.utils.getTimestampFromMonth
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -25,6 +29,15 @@ class SeasonalKeyPollutantsHelperTest{
         val input = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
         val expected = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3)
         val result = seasonalHelper.includeKeyPollutants(input, getTimestampFromMonth(10, 31))
+
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun includesMissingKeyPollutantsAsNecessaryWhileRetainingOthers(){
+        val input = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_NO2 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO)
+        val expected = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO)
+        val result = seasonalHelper.includeKeyPollutants(input, getTimestampFromMonth(9))
 
         assertEquals(expected, result)
     }

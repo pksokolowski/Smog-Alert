@@ -7,8 +7,8 @@ import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_AIR_QUALITY_MISSING
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_LOCATION_MISSING
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_NO_INTERNET
-import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_SUCCESS
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_USED_ACTIVE_LOCATION_METHOD
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_USED_API
@@ -85,18 +85,23 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         var expectedCoverage = SensorsPresence()
         flags = flags or FLAG_USED_API
         var passes = 0
+        var lastErrorsCode = 0
 
         for (s in stations) {
             val sensors = if (s.sensorFlags > 0) {
                 s.sensorFlags
             } else {
-                stationsRepository.fetchSensorsData(s.id)?.sensorFlags ?: continue
+                stationsRepository.fetchSensorsData(s.id)?.sensorFlags
+                        ?: return AirQualityLog(errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
+                                timeStamp = timeStamp, metadata = flags)
             }
 
             if (gainedCoverage.hasSensors(sensors)) continue
             expectedCoverage = expectedCoverage.combinedWith(sensors)
 
             val log = getLogFromAPI(s.id, timeStamp)
+            if(log.errorCode > 0) lastErrorsCode = log.errorCode
+
             val logsSensorCoverage = log.details.getSensorCoverage()
             gainedCoverage = gainedCoverage.combinedWith(logsSensorCoverage)
             details = details.combinedWith(log.details)
@@ -113,11 +118,13 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             -1
         }
 
+        val errorCode = if(gainedCoverage.sensorFlags != 0) ERROR_CODE_SUCCESS else lastErrorsCode
+
         return AirQualityLog(0,
                 airQualityIndex,
                 details,
                 stations.first().id,
-                ERROR_CODE_SUCCESS,
+                errorCode,
                 timeStamp,
                 flags,
                 expectedCoverage)

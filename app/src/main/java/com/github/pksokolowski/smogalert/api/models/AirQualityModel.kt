@@ -42,6 +42,10 @@ class AirQualityModel {
     @Expose
     var c6h6: IndexLevel? = null
 
+    @SerializedName("stIndexStatus")
+    @Expose
+    var status: Boolean? = null
+
     class IndexLevel {
         @SerializedName("id")
         @Expose
