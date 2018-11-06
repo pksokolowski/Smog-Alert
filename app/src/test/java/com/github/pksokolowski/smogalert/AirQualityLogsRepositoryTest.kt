@@ -12,6 +12,8 @@ import com.github.pksokolowski.smogalert.location.LocationHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.StationsRepository
 import com.github.pksokolowski.smogalert.utils.InternetConnectionChecker
+import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_NO2
@@ -57,7 +59,7 @@ class AirQualityLogsRepositoryTest {
     }
 
     @Test
-    fun combinesDataFromMultipleStationsToFillPartialShortagesOnPreviousStations(){
+    fun combinesDataFromMultipleStationsToFillPartialShortagesOnPreviousStations() {
         val pack = MockPack(
                 mapOf(
                         // note: sensorFlags = 127 means that all sensors' data should be present.
@@ -73,7 +75,7 @@ class AirQualityLogsRepositoryTest {
     }
 
     @Test
-    fun usesNewlyMadeAvailableSensorsEvenBeforeCacheIsUpdatedToIncludeThem(){
+    fun usesNewlyMadeAvailableSensorsEvenBeforeCacheIsUpdatedToIncludeThem() {
         val pack = MockPack(
                 mapOf(
                         Station(1, FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6, 50.0, 20.001) to makeLog(9999000),
@@ -143,7 +145,8 @@ class AirQualityLogsRepositoryTest {
             deviceLongitude: Double = 20.0,
             val stationSensorsById: Map<Long, Int> = stationModelMap.keys.map { it.id to 127 }.toMap(),
             var locationResult: LocationHelper.LocationResult = LocationHelper.LocationResult(Location("loc").apply { latitude = deviceLatitude; longitude = deviceLongitude }, LocationHelper.SUCCESS, false),
-            var netAvailable: Boolean = true) {
+            var netAvailable: Boolean = true,
+            val seasonalKeyPollutantFlags: Int = 0) {
 
         val airQualityLogsRepo: AirQualityLogsRepository
 
@@ -151,9 +154,27 @@ class AirQualityLogsRepositoryTest {
             val dao = AirQualityLogsDaoMock(cachedAQLogs)
             val service = AirQualityServiceMock(stationModelMap)
             val netChecker = getInternetConnectionCheckerMock()
+            val seasonalHelper = getSeasonalHelperMock()
             val locationHelper = getLocationHelperMock()
             val stationsRepo = getStationsRepoMock()
-            airQualityLogsRepo = AirQualityLogsRepository(dao, service, stationsRepo, locationHelper, netChecker)
+            airQualityLogsRepo = AirQualityLogsRepository(dao, service, stationsRepo, locationHelper, netChecker, seasonalHelper)
+        }
+
+        // fix for Mockito's bug with Kotlin's null safety
+        // this replaces argument matcher "any()"
+        private fun <T> anything(): T {
+            Mockito.any<T>()
+            return uninitialized()
+        }
+        private fun <T> uninitialized(): T = null as T
+
+        private fun getSeasonalHelperMock(): SeasonalKeyPollutantsHelper {
+            val mock = Mockito.mock(SeasonalKeyPollutantsHelper::class.java)
+            `when`(mock.includeKeyPollutants(anything(), anyLong())).then {
+                val gainedCoverage = it.arguments[0] as SensorsPresence
+                gainedCoverage.combinedWith(seasonalKeyPollutantFlags)
+            }
+            return mock
         }
 
         private fun getInternetConnectionCheckerMock(): InternetConnectionChecker {

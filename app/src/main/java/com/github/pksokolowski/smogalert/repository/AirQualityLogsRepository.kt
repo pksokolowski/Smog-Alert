@@ -19,6 +19,7 @@ import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.location.LocationHelper
 import com.github.pksokolowski.smogalert.utils.AirQualityLogDataConverter
 import com.github.pksokolowski.smogalert.utils.InternetConnectionChecker
+import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import java.util.*
 import javax.inject.Inject
@@ -28,7 +29,8 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                                                    private val airQualityService: AirQualityService,
                                                    private val stationsRepository: StationsRepository,
                                                    private val locationHelper: LocationHelper,
-                                                   private val connectionChecker: InternetConnectionChecker) {
+                                                   private val connectionChecker: InternetConnectionChecker,
+                                                   private val seasonalKeyPollutantsHelper: SeasonalKeyPollutantsHelper) {
 
     class LogData(val log: AirQualityLog, val isFromCache: Boolean)
 
@@ -102,6 +104,8 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             if (gainedCoverage.hasFullCoverage()) break
             if (++passes == MAX_STATION_REQUESTS) break
         }
+
+        expectedCoverage = seasonalKeyPollutantsHelper.includeKeyPollutants(expectedCoverage, timeStamp)
 
         val airQualityIndex = if (gainedCoverage.hasSensors(expectedCoverage)) {
             details.getHighestIndex()

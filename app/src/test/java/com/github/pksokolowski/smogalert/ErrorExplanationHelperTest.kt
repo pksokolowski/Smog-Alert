@@ -5,6 +5,7 @@ import android.content.res.Resources
 import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.utils.ErrorExplanationHelper
+import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
@@ -13,6 +14,7 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SE
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
+import com.github.pksokolowski.smogalert.utils.getTimestampFromMonth
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -31,7 +33,7 @@ class ErrorExplanationHelperTest {
     fun handlesErrors() {
         for (errorCode in 1..5) {
             val log = AirQualityLog(errorCode = errorCode, timeStamp = 0)
-            val result = ErrorExplanationHelper.explain(log, mockContext)
+            val result = errorExplanationHelper.explain(log, mockContext)
             assertEquals(errorCode.toString(), result)
         }
     }
@@ -42,7 +44,7 @@ class ErrorExplanationHelperTest {
                 details = PollutionDetails(0, 0, 0, 1, 0, -1, -1),
                 timeStamp = 0)
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -54,7 +56,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(10))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -66,7 +68,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO),
                 timeStamp = getTimestampFromMonth(11, 4))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -78,7 +80,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25),
                 timeStamp = getTimestampFromMonth(2, 12))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -90,7 +92,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(2))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -102,7 +104,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(4))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -114,7 +116,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(12))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -126,7 +128,7 @@ class ErrorExplanationHelperTest {
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(4))
 
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
@@ -136,7 +138,7 @@ class ErrorExplanationHelperTest {
         val log = AirQualityLog(
                 details = PollutionDetails(-1, -1, -1, -1, -1, -1, -1),
                 timeStamp = 0)
-        val result = ErrorExplanationHelper.explain(log, mockContext)
+        val result = errorExplanationHelper.explain(log, mockContext)
         val expected = FAKE_ERROR_TO_EXPLANATION_MAP[R.string.error_explanation_server]
         assertEquals(expected, result)
     }
@@ -164,13 +166,11 @@ class ErrorExplanationHelperTest {
         }
     }
 
-    private fun getTimestampFromMonth(monthNumber: Int, dayNum: Int = 10): Long {
-        val cal = Calendar.getInstance(Locale.US).apply {
-            timeInMillis = 0
-            set(Calendar.MONTH, monthNumber-1)
-            set(Calendar.DAY_OF_MONTH, dayNum)
-        }
-        return cal.timeInMillis
+    private lateinit var errorExplanationHelper: ErrorExplanationHelper
+
+    @Before
+    fun prepareHelper(){
+        errorExplanationHelper = ErrorExplanationHelper(SeasonalKeyPollutantsHelper())
     }
 
     private companion object {

@@ -25,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var locationAvailabilityHelper: LocationAvailabilityHelper
 
+    @Inject
+    lateinit var errorExplanationHelper: ErrorExplanationHelper
+
     private lateinit var viewModel: MainActivityViewModel
 
     private var isLocationAccessRequestPending = false
@@ -45,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             air_quality_textview.text = AirQualityIndexHelper.getTitle(index, this)
             air_quality_textview.setTextColor(textColor)
 
-            explanationTextView.text = ErrorExplanationHelper.explain(it, this)
+            explanationTextView.text = errorExplanationHelper.explain(it, this)
 
             if (it.errorCode == AirQualityLog.ERROR_CODE_LOCATION_MISSING) {
                 promptUserAboutLocationAccessIfMissing(it.id == 1L)
