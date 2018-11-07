@@ -165,7 +165,22 @@ class AirQualityLogsRepositoryTest {
 
         val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
         assertEquals("did not get data despite only one station having error and being fully replaced by subsequent ones", 1, freshLog.airQualityIndex)
-        assertEquals("did not assign a connection error correctly", AirQualityLog.ERROR_CODE_SUCCESS, freshLog.errorCode)
+        assertEquals("did assign a connection error incorrectly", AirQualityLog.ERROR_CODE_SUCCESS, freshLog.errorCode)
+    }
+
+    @Test
+    fun expandsExpectationsToIncludeSeasonalKeyPollutantsWhenMissing() {
+        val pack = MockPack(mapOf(
+                Station(3, FLAG_SENSOR_O3, 50.0, 20.0) to makeLog(9939999),
+                Station(1, FLAG_SENSOR_O3, 50.0, 20.002) to makeLog(9919999),
+                Station(2, FLAG_SENSOR_NO2 or FLAG_SENSOR_C6H6, 50.0, 20.003) to makeLog(9991929)
+        ),
+                seasonalKeyPollutantFlags = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+        val expected = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_C6H6)
+
+        assertEquals("did not include seasonal key pollutants in expectations", expected, freshLog.expectedSensorCoverage)
     }
 
     /**
