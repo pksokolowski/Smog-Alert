@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.github.pksokolowski.smogalert">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -9,12 +10,13 @@
 
     <application
         android:name=".di.App"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity"
             android:launchMode="singleTask"
             android:resizeableActivity="false">
@@ -27,7 +29,8 @@
         <service android:name=".job.AirQualityCheckJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true"/>
-        <receiver android:name=".location.ActiveLocationRequestHelper">
+        <receiver android:name=".location.ActiveLocationRequestHelper"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.github.pksokolowski.smogalert.action_process_location_update" />
             </intent-filter>
