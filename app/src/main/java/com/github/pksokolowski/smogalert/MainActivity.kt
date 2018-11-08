@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var errorExplanationHelper: ErrorExplanationHelper
 
+    @Inject
+    lateinit var airQualityIndexHelper: AirQualityIndexHelper
+
     private lateinit var viewModel: MainActivityViewModel
 
     private var isLocationAccessRequestPending = false
@@ -42,13 +45,12 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getAirQualityInfo().observe(this, Observer {
             if (it == null) return@Observer
-            val index = it.airQualityIndex
-            val textColor = AirQualityIndexHelper.getColor(index, this)
 
-            air_quality_textview.text = AirQualityIndexHelper.getTitle(index, this)
+            val textColor = airQualityIndexHelper.getColor(it)
+            air_quality_textview.text = airQualityIndexHelper.getTitle(it)
             air_quality_textview.setTextColor(textColor)
 
-            explanationTextView.text = errorExplanationHelper.explain(it, this)
+            explanationTextView.text = errorExplanationHelper.explain(it)
 
             if (it.errorCode == AirQualityLog.ERROR_CODE_LOCATION_MISSING) {
                 promptUserAboutLocationAccessIfMissing(it.id == 1L)

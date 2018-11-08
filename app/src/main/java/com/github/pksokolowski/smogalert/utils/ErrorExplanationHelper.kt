@@ -1,5 +1,6 @@
 package com.github.pksokolowski.smogalert.utils
 
+import android.app.Application
 import android.content.Context
 import com.github.pksokolowski.smogalert.R
 import com.github.pksokolowski.smogalert.db.AirQualityLog
@@ -16,12 +17,13 @@ import javax.inject.Inject
  * Provides an explanation of the error codes from AirQualityLog objects
  */
 @PerApp
-class ErrorExplanationHelper @Inject constructor(private val seasonalKeyPollutantsHelper: SeasonalKeyPollutantsHelper) {
-        fun explain(log: AirQualityLog, context: Context): String {
+class ErrorExplanationHelper @Inject constructor(private val seasonalKeyPollutantsHelper: SeasonalKeyPollutantsHelper,
+                                                 private val context: Application) {
+        fun explain(log: AirQualityLog): String {
             if (log.airQualityIndex == -1 && log.errorCode == ERROR_CODE_SUCCESS) {
                 val highestSubIndex = log.details.getHighestIndex()
                 return if (highestSubIndex > -1) {
-                    getPartialDataExplanation(highestSubIndex, log, context)
+                    getPartialDataExplanation(highestSubIndex, log)
                 } else {
                     context.getString(R.string.error_explanation_server)
                 }
@@ -39,7 +41,7 @@ class ErrorExplanationHelper @Inject constructor(private val seasonalKeyPollutan
 
         }
 
-        private fun getPartialDataExplanation(highestSubIndex: Int, log: AirQualityLog, context: Context): String {
+        private fun getPartialDataExplanation(highestSubIndex: Int, log: AirQualityLog): String {
             val possibleIndexTitle = AirQualityIndexHelper.getTitle(highestSubIndex, context).toLowerCase()
 
             return if (seasonalKeyPollutantsHelper.coversKeyPollutantsIfExpected(log))

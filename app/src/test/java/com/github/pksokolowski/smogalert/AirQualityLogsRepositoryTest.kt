@@ -22,6 +22,7 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SE
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
+import com.github.pksokolowski.smogalert.utils.anything
 import org.junit.Assert.assertEquals
 import okhttp3.Request
 import org.junit.Test
@@ -238,14 +239,6 @@ class AirQualityLogsRepositoryTest {
             val stationsRepo = getStationsRepoMock()
             airQualityLogsRepo = AirQualityLogsRepository(dao, service, stationsRepo, locationHelper, netChecker, seasonalHelper)
         }
-
-        // fix for Mockito's bug with Kotlin's null safety
-        // this replaces argument matcher "any()"
-        private fun <T> anything(): T {
-            Mockito.any<T>()
-            return uninitialized()
-        }
-        private fun <T> uninitialized(): T = null as T
 
         private fun getSeasonalHelperMock(): SeasonalKeyPollutantsHelper {
             val mock = Mockito.mock(SeasonalKeyPollutantsHelper::class.java)
