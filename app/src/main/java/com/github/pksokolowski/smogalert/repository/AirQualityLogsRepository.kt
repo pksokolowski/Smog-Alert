@@ -17,10 +17,7 @@ import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.db.Station
 import com.github.pksokolowski.smogalert.di.PerApp
 import com.github.pksokolowski.smogalert.location.LocationHelper
-import com.github.pksokolowski.smogalert.utils.AirQualityLogDataConverter
-import com.github.pksokolowski.smogalert.utils.InternetConnectionChecker
-import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
-import com.github.pksokolowski.smogalert.utils.SensorsPresence
+import com.github.pksokolowski.smogalert.utils.*
 import java.util.*
 import javax.inject.Inject
 
@@ -175,7 +172,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     }
 
     private companion object {
-        const val ACCEPTABLE_LOG_AGE = 30 * 60000 - 1
+        const val ACCEPTABLE_LOG_AGE = MIN_INTERVAL_BETWEEN_API_CALLS
         const val ACCEPTABLE_DISTANCE_TO_STATION = 10000F
 
         const val MAX_STATION_REQUESTS = 10

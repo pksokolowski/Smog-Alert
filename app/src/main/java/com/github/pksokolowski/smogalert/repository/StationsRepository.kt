@@ -10,6 +10,7 @@ import com.github.pksokolowski.smogalert.db.StationsUpdateLog.Companion.STATUS_F
 import com.github.pksokolowski.smogalert.db.StationsUpdateLog.Companion.STATUS_SUCCESS
 import com.github.pksokolowski.smogalert.db.StationsUpdateLogsDao
 import com.github.pksokolowski.smogalert.di.PerApp
+import com.github.pksokolowski.smogalert.utils.MIN_INTERVAL_BETWEEN_API_CALLS
 import com.github.pksokolowski.smogalert.utils.SensorsDataConverter
 import com.github.pksokolowski.smogalert.utils.StationDataConverter
 import java.util.*
@@ -155,7 +156,7 @@ class StationsRepository @Inject constructor(private val stationsDao: StationsDa
         const val FAILURE = 1
         const val DAY_IN_MILLIS = 86400000L
         const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE = DAY_IN_MILLIS
-        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE = 30 * 60000L - 1
+        const val CACHE_UPDATE_INTERVAL_AFTER_FAILURE_AND_WITHOUT_CACHE = MIN_INTERVAL_BETWEEN_API_CALLS
         const val CACHE_UPDATE_INTERVAL_AFTER_SUCCESS = DAY_IN_MILLIS
         const val MAX_ABSENCE_COUNT_BEFORE_DELETION = 6
     }

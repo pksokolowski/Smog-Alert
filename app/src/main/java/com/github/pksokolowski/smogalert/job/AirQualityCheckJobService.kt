@@ -60,38 +60,31 @@ class AirQualityCheckJobService : JobService() {
                 }
 
                 val current = data.logs.getOrNull(0)
-                val previous = data.logs.getOrNull(1)
+                val comparisonPoint = if (checkParams.isOneTimeRetry) data.logs.getOrNull(2)
+                else data.logs.getOrNull(1)
 
                 val warningIndexLevel = checkParams.getMinimumWarningIndexLevel()
+                val comparisonResult = AQLogsComparer.compare(current, comparisonPoint, warningIndexLevel)
 
-                if (checkParams.isOneTimeRetry) {
-                    // do not reschedule the periodic job here, it would cancel this job immediately
-
-                    val third = data.logs.getOrNull(2)
-                    val comparisonResult = AQLogsComparer.compare(current, third, warningIndexLevel)
-                    when (comparisonResult) {
-                        RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
-                        RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
-                        RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
-                        RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
-                        RESULT_ERROR_EMERGED -> notificationHelper.showError()
-                        else -> {
-                        }
-                    }
-                } else {
-                    val comparisonResult = AQLogsComparer.compare(current, previous, warningIndexLevel)
-                    when (comparisonResult) {
-                        RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
-                        RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
-                        RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
-                        RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
-                        RESULT_ERROR_EMERGED -> if (current?.hasFlag(AirQualityLog.FLAG_USED_API) == true) {
+                when (comparisonResult) {
+                    // do not reschedule the periodic job here, if it's a one time retry,
+                    // it would cancel this job immediately
+                    RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
+                    RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
+                    RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
+                    RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
+                    RESULT_ERROR_EMERGED ->
+                        if (checkParams.isOneTimeRetry) {
                             notificationHelper.showError()
                         } else {
-                            jobsHelper.scheduleOneTimeRetry(checkParams.sensitivity)
+                            // if API was used, show error, otherwise schedule a retry
+                            if (current?.hasFlag(AirQualityLog.FLAG_USED_API) == true) {
+                                notificationHelper.showError()
+                            } else {
+                                jobsHelper.scheduleOneTimeRetry(checkParams.sensitivity)
+                            }
                         }
-                        else -> {
-                        }
+                    else -> {
                     }
                 }
 
