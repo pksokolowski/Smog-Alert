@@ -46,7 +46,7 @@
     </array>
 
     <array name="sensitivity_level_descriptions">
-        <item>Ostrzeganie o smogu jest wyłączone. Aby otrzymywać powiadomienia, gdy jakość powietrza spadnie do danego poziomu, wybierz ten poziom przesuwając suwak poniżej.</item>
+        <item>Ostrzeganie o smogu jest wyłączone. Aby otrzymywać powiadomienia, gdy jakość powietrza spadnie do danego poziomu, wybierz ten poziom za pomocą suwaka poniżej.</item>
         <item>Zaleca się unikanie przebywania na powietrzu, w szczególności odradza się podejmowania tam aktywności fizycznej.</item>
         <item>Zaleca się rozważenie ograniczenia czasu spędzonego na powietrzu, zwłaszcza jeżeli w grę wchodzi aktywność fizyczna.</item>
         <item>Jakość powietrza jest akceptowalna, nie ma jednoznacznych zaleceń w sprawie przebywania na zewnątrz, nawet w ramach aktywności fizycznej. Niemniej zwraca się uwagę, że nadal może to być niekorzystne dla zdrowia.</item>
