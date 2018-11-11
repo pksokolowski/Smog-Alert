@@ -9,6 +9,7 @@ import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.notifications.NotificationHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogsData
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -83,6 +84,16 @@ class AirQualityCheckJobServiceTest {
 
         jobService.onStartJob(mockJobParameters)
         verify(mockNotificationHelper).showError()
+    }
+
+    @Test
+    fun showsLikelyOkMessageWhenSomeSensorsAreMissingButKeyOnesIndicateImprovement() {
+        current = AirQualityLog(2, 1, PollutionDetails(1199999), 110, 0, 2, 1, SensorsPresence(127))
+        previous = AirQualityLog(1, 2, PollutionDetails(2299999), 110, 0, 1, 1, SensorsPresence(127))
+        airCheckParams = AirCheckParams(3, false)
+
+        jobService.onStartJob(mockJobParameters)
+        verify(mockNotificationHelper).showLikelyOk()
     }
 
     @Spy

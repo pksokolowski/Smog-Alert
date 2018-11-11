@@ -55,9 +55,9 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
-    fun showLikelyImprovement() {
+    fun showLikelyOk() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_IMPROVEMENT)
-                .setContentText(context.getString(R.string.notification_improvement_likely_message))
+                .setContentText(context.getString(R.string.notification_likely_ok_message))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_info_outline_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))

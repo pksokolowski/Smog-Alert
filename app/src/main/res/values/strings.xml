@@ -10,12 +10,12 @@
     <string name="notification_channel_data_shortage_description">These notifications appear when the data server is contacted correctly, but there are no air quality measurements available, like when there are technical difficulties.</string>
     <string name="notification_alerts_message">Air quality has declined</string>
     <string name="notification_improvement_message">Air quality has improved</string>
-    <string name="notification_improvement_likely_message">Air quality has likely improved</string>
+    <string name="notification_likely_ok_message">Air quality is likely acceptable</string>
     <string name="notification_data_shortage_message">Air quality is unknown</string>
     <string name="notification_data_shortage_over_air_ok_message">Air quality is acceptable</string>
     <string name="notification_error_message">An error occurred</string>
 
-    <string name="error_explanation_partial_data">Some data is missing</string>
+    <string name="error_explanation_partial_data">Some data is missing, but the most likely threats are covered</string>
     <string name="error_explanation_partial_data_without_key_pollutants">Key data is missing. Might be %s but likely is worse</string>
     <string name="error_explanation_server">Server didn\'t have the data</string>
     <string name="error_explanation_internet">No internet access</string>
