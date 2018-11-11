@@ -27,7 +27,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                                                    private val stationsRepository: StationsRepository,
                                                    private val locationHelper: LocationHelper,
                                                    private val connectionChecker: InternetConnectionChecker,
-                                                   private val seasonalKeyPollutantsHelper: SeasonalKeyPollutantsHelper) {
+                                                   private val seasonalHelper: SeasonalKeyPollutantsHelper) {
 
     class LogData(val log: AirQualityLog, val isFromCache: Boolean)
 
@@ -37,7 +37,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         val latestCachedLog = airQualityLogsDao.getLatestAirQualityLog()
         if (latestCachedLog == null
                 || latestCachedLog.timeStamp < timeNow - ACCEPTABLE_LOG_AGE
-                || !latestCachedLog.hasFlag(FLAG_USED_API)) {
+                || !latestCachedLog.hasFlags(FLAG_USED_API)) {
             val freshLog = fetchFreshLog(timeNow)
             val logId = airQualityLogsDao.insertAirQualityLog(freshLog)
             return LogData(freshLog.assignId(logId), false)
@@ -107,9 +107,9 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             if (++passes == MAX_STATION_REQUESTS) break
         }
 
-        expectedCoverage = seasonalKeyPollutantsHelper.includeKeyPollutants(expectedCoverage, timeStamp)
+        expectedCoverage = seasonalHelper.includeKeyPollutants(expectedCoverage, timeStamp)
 
-        val airQualityIndex = if (gainedCoverage.hasSensors(expectedCoverage)) {
+        val airQualityIndex = if (seasonalHelper.coversKeyPollutantsIfExpected(gainedCoverage, expectedCoverage, timeStamp)) {
             details.getHighestIndex()
         } else {
             -1

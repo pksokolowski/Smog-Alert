@@ -40,7 +40,7 @@ class AirQualityLogDataConverterTest {
         val model = getModel(PollutionDetails(), indexStatus = false)
         val log = AirQualityLogDataConverter.toAirQualityLog(model, 0, 0)
         for (s in SENSORS) {
-            if (log.hasFlag(s)) fail()
+            if (log.hasFlags(s)) fail()
         }
     }
 
@@ -68,7 +68,7 @@ class AirQualityLogDataConverterTest {
 //
 //            for (s in SENSORS.indices) {
 //                val sensor = SENSORS[s]
-//                val has = log.hasFlag(sensor)
+//                val has = log.hasFlags(sensor)
 //                val shouldHave = sensorsPicked[s]
 //                if (has != shouldHave) fail()
 //            }

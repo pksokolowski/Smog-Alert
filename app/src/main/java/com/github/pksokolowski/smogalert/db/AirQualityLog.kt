@@ -50,10 +50,11 @@ data class AirQualityLog(
     fun assignId(id: Long) =
             AirQualityLog(id, airQualityIndex, details,  nearestStationId, errorCode, timeStamp, metadata, expectedSensorCoverage)
 
-    fun hasFlag(flag: Int) = metadata and flag != 0
+    fun hasFlags(flags: Int) = metadata and flags == flags
 
-    fun addFlags(flags: Int) =
-            AirQualityLog(id, airQualityIndex, details, nearestStationId, errorCode, timeStamp, metadata or flags, expectedSensorCoverage)
+    fun hasExpectedCoverage() = details.getSensorCoverage().hasSensors(expectedSensorCoverage) && errorCode == 0
+
+    fun hasIndex() = airQualityIndex != -1
 
     companion object {
         const val ERROR_CODE_SUCCESS = 0

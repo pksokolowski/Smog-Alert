@@ -69,6 +69,15 @@ class SeasonalKeyPollutantsHelperTest{
         assertEquals(expected, result)
     }
 
+    @Test
+    fun findsKeyPollutantsPresenceWhenTheyArePresentButOtherPollutantsAreMissing(){
+        val gained = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_SO2 or FLAG_SENSOR_CO)
+        val expected = SensorsPresence(127)
+        val result = seasonalHelper.coversKeyPollutantsIfExpected(gained, expected, getTimestampFromMonth(11, 11))
+
+        assertEquals(result, true)
+    }
+
     private val seasonalHelper = SeasonalKeyPollutantsHelper()
 
 }

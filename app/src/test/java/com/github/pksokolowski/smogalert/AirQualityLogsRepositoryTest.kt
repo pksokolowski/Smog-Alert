@@ -12,9 +12,7 @@ import com.github.pksokolowski.smogalert.db.Station
 import com.github.pksokolowski.smogalert.location.LocationHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.StationsRepository
-import com.github.pksokolowski.smogalert.utils.InternetConnectionChecker
-import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
-import com.github.pksokolowski.smogalert.utils.SensorsPresence
+import com.github.pksokolowski.smogalert.utils.*
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_NO2
@@ -22,10 +20,10 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SE
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
-import com.github.pksokolowski.smogalert.utils.anything
 import org.junit.Assert.assertEquals
 import okhttp3.Request
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.anyLong
@@ -39,7 +37,7 @@ class AirQualityLogsRepositoryTest {
     fun fetchesASimpleLog() {
         val pack = MockPack(mapOf(
                 Station(1, FLAG_SENSOR_O3 or FLAG_SENSOR_NO2, 50.0, 20.0) to makeLog(9912999)
-        ))
+        ), monthOfYear = 7)
 
         val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
         assertEquals("cannot fetch basic result", 2, freshLog.airQualityIndex)
@@ -54,7 +52,7 @@ class AirQualityLogsRepositoryTest {
                 ,
                 stationSensorsById = mapOf(
                         1L to (FLAG_SENSOR_O3 or FLAG_SENSOR_CO)
-                ))
+                ), monthOfYear = 7)
 
         val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
         assertEquals("cannot fetch sensors availability data", 4, freshLog.airQualityIndex)
@@ -176,12 +174,25 @@ class AirQualityLogsRepositoryTest {
                 Station(1, FLAG_SENSOR_O3, 50.0, 20.002) to makeLog(9919999),
                 Station(2, FLAG_SENSOR_NO2 or FLAG_SENSOR_C6H6, 50.0, 20.003) to makeLog(9991929)
         ),
-                seasonalKeyPollutantFlags = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
+                monthOfYear = 2)
 
         val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
         val expected = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_C6H6)
 
         assertEquals("did not include seasonal key pollutants in expectations", expected, freshLog.expectedSensorCoverage)
+    }
+
+    @Test
+    fun assignsIndexWhenOnlyNonKeyPollutantsAreMissing() {
+        val pack = MockPack(mapOf(
+                Station(1, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_SO2, 50.0, 20.0) to makeLog(2200099),
+                Station(2, FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_NO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO, 50.0, 20.002) to makeLog(2290990)
+        ),
+                monthOfYear = 11)
+
+        val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
+
+        assertEquals("did not include seasonal key pollutants in expectations", 2, freshLog.airQualityIndex)
     }
 
     /**
@@ -226,9 +237,13 @@ class AirQualityLogsRepositoryTest {
             val stationSensorsById: Map<Long, Int> = stationModelMap.keys.map { it.id to 127 }.toMap(),
             var locationResult: LocationHelper.LocationResult = LocationHelper.LocationResult(Location("loc").apply { latitude = deviceLatitude; longitude = deviceLongitude }, LocationHelper.SUCCESS, false),
             var netAvailable: Boolean = true,
-            val seasonalKeyPollutantFlags: Int = 0) {
+            val monthOfYear: Int = 2) {
 
         val airQualityLogsRepo: AirQualityLogsRepository
+
+        // used to prevent reimplementation, but some of the parameters are replaced before
+        // it's used, namely timeStamp
+        private val actualSeasonalHelper = SeasonalKeyPollutantsHelper()
 
         init {
             val dao = AirQualityLogsDaoMock(cachedAQLogs)
@@ -244,7 +259,12 @@ class AirQualityLogsRepositoryTest {
             val mock = Mockito.mock(SeasonalKeyPollutantsHelper::class.java)
             `when`(mock.includeKeyPollutants(anything(), anyLong())).then {
                 val gainedCoverage = it.arguments[0] as SensorsPresence
-                gainedCoverage.combinedWith(seasonalKeyPollutantFlags)
+                actualSeasonalHelper.includeKeyPollutants(gainedCoverage, getTimestampFromMonth(monthOfYear))
+            }
+            `when`(mock.coversKeyPollutantsIfExpected(anything(), anything(), anyLong())).then{
+                val gainedCoverage = it.arguments[0] as SensorsPresence
+                val expectedCoverage = it.arguments[1] as SensorsPresence
+                actualSeasonalHelper.coversKeyPollutantsIfExpected(gainedCoverage, expectedCoverage, getTimestampFromMonth(monthOfYear))
             }
             return mock
         }

@@ -8,16 +8,14 @@ import com.github.pksokolowski.smogalert.di.PerApp
 import javax.inject.Inject
 
 @PerApp
-class AirQualityIndexHelper @Inject constructor(private val seasonalKeyPollutantsHelper: SeasonalKeyPollutantsHelper,
-                                                private val context: Application) {
+class AirQualityIndexHelper @Inject constructor(private val context: Application) {
     fun getTitle(log: AirQualityLog): String {
         val index = log.airQualityIndex
         return getTitle(index, context)
     }
 
     fun getColor(log: AirQualityLog): Int {
-        val coversKeyPollutantsIfExpected = seasonalKeyPollutantsHelper.coversKeyPollutantsIfExpected(log)
-        val index = if (coversKeyPollutantsIfExpected) log.details.getHighestIndex() else log.airQualityIndex
+        val index = log.airQualityIndex
         return getColor(index, context)
     }
 

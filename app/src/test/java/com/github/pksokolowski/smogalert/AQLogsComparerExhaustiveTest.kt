@@ -10,6 +10,7 @@ import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_ERR
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_IMPROVED_PAST_THRESHOLD
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_NO_INTERPRETATION
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_OK_AFTER_SHORTAGE_ENDED
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import org.junit.Assert.fail
 import org.junit.Test
 import java.lang.StringBuilder
@@ -95,11 +96,11 @@ class AQLogsComparerExhaustiveTest {
 
     private data class Case(val previous: SimpleAQLogCategory, val current: SimpleAQLogCategory, val expectedResult: Int)
     private enum class SimpleAQLogCategory(val log: AirQualityLog?) {
-        PART_OK(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999990), timeStamp = 0)),
-        PART_BAD(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999995), timeStamp = 0)),
-        OK(AirQualityLog(airQualityIndex = 0, details = PollutionDetails(0), timeStamp = 0)),
-        BAD(AirQualityLog(airQualityIndex = 5, details = PollutionDetails(5555555), timeStamp = 0)),
-        UNKNOWN(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999999), timeStamp = 0)),
+        PART_OK(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999990), timeStamp = 0, expectedSensorCoverage = SensorsPresence(127))),
+        PART_BAD(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999995), timeStamp = 0, expectedSensorCoverage = SensorsPresence(127))),
+        OK(AirQualityLog(airQualityIndex = 0, details = PollutionDetails(0), timeStamp = 0, expectedSensorCoverage = SensorsPresence(127))),
+        BAD(AirQualityLog(airQualityIndex = 5, details = PollutionDetails(5555555), timeStamp = 0, expectedSensorCoverage = SensorsPresence(127))),
+        UNKNOWN(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999999), timeStamp = 0, expectedSensorCoverage = SensorsPresence(127))),
         NULL(null),
         ERROR(AirQualityLog(airQualityIndex = -1, details = PollutionDetails(9999999), timeStamp = 0, errorCode = AirQualityLog.ERROR_CODE_LOCATION_MISSING))
     }

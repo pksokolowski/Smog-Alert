@@ -1,7 +1,9 @@
 package com.github.pksokolowski.smogalert
 
 import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AQLogsComparer
+import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import org.junit.Assert
 import org.junit.Test
 
@@ -109,8 +111,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsDataShortageEndWhenAirIsOk() {
-        val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1)
-        val current = AirQualityLog(id = 2, airQualityIndex = 3, timeStamp = 2)
+        val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1, details = PollutionDetails(9999999), expectedSensorCoverage = SensorsPresence(127))
+        val current = AirQualityLog(id = 2, airQualityIndex = 3, timeStamp = 2, details = PollutionDetails(1111111), expectedSensorCoverage = SensorsPresence(127))
 
         val result = AQLogsComparer.compare(current, previous, 4)
         Assert.assertEquals(AQLogsComparer.RESULT_OK_AFTER_SHORTAGE_ENDED, result)
@@ -118,8 +120,8 @@ class AQLogsComparerTest {
 
     @Test
     fun detectsBadAirRightAfterDataShortage() {
-        val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1)
-        val current = AirQualityLog(id = 2, airQualityIndex = 5, timeStamp = 2)
+        val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1, details = PollutionDetails(9999999), expectedSensorCoverage = SensorsPresence(127))
+        val current = AirQualityLog(id = 2, airQualityIndex = 5, timeStamp = 2, details = PollutionDetails(5555555), expectedSensorCoverage = SensorsPresence(127))
 
         val result = AQLogsComparer.compare(current, previous, 4)
         Assert.assertEquals(AQLogsComparer.RESULT_DEGRADED_PAST_THRESHOLD, result)

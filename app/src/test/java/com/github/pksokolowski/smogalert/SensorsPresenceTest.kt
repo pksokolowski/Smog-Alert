@@ -14,6 +14,13 @@ class SensorsPresenceTest {
     }
 
     @Test
+    fun hasSensorsWorksWhenArgumentIsZero() {
+        val gainedCoverage = SensorsPresence(95)
+        val expectedCoverage = SensorsPresence(0)
+        if (!gainedCoverage.hasSensors(expectedCoverage)) fail("has sensors did not work with 0 argument")
+    }
+
+    @Test
     fun hasFlagsWorksCorrectlyWithAllFlagsCombinations() {
         for (i in 0..127) {
             for (ii in 0..127) {

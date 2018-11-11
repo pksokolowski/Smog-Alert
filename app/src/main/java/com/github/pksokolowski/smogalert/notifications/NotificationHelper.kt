@@ -55,6 +55,23 @@ class NotificationHelper @Inject constructor(private val context: Application) {
         notificationManager.notify(NOTIFICATIONS_ID, notification)
     }
 
+    fun showLikelyImprovement() {
+        val b = NotificationCompat.Builder(context, CHANNEL_ID_IMPROVEMENT)
+                .setContentText(context.getString(R.string.notification_improvement_likely_message))
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_info_outline_white_24dp)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setColor(Color.GREEN)
+                .setLights(Color.GREEN, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
+                .setContentIntent(getOpenMainActivityPendingIntent(context))
+                .setAutoCancel(true)
+
+        val notification = b.build()
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        notificationManager.notify(NOTIFICATIONS_ID, notification)
+    }
+
     fun showDataShortage() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
                 .setContentText(context.getString(R.string.notification_data_shortage_message))

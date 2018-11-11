@@ -70,7 +70,12 @@ class AirQualityCheckJobService : JobService() {
                     // do not reschedule the periodic job here, if it's a one time retry,
                     // it would cancel this job immediately
                     RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
-                    RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
+                    RESULT_IMPROVED_PAST_THRESHOLD -> {
+                        if (current?.hasExpectedCoverage() == true)
+                            notificationHelper.showImprovement()
+                        else
+                            notificationHelper.showLikelyImprovement()
+                    }
                     RESULT_OK_AFTER_SHORTAGE_ENDED -> notificationHelper.showAirIsOkAfterShortage()
                     RESULT_DATA_SHORTAGE_STARTED -> notificationHelper.showDataShortage()
                     RESULT_ERROR_EMERGED ->
@@ -78,7 +83,7 @@ class AirQualityCheckJobService : JobService() {
                             notificationHelper.showError()
                         } else {
                             // if API was used, show error, otherwise schedule a retry
-                            if (current?.hasFlag(AirQualityLog.FLAG_USED_API) == true) {
+                            if (current?.hasFlags(AirQualityLog.FLAG_USED_API) == true) {
                                 notificationHelper.showError()
                             } else {
                                 jobsHelper.scheduleOneTimeRetry(checkParams.sensitivity)

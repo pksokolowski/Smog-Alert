@@ -14,11 +14,16 @@ class SeasonalKeyPollutantsHelper @Inject constructor() {
     /**
      * Checks if the log covers the key pollutants that it has in it's expectedCoverage
      */
-    fun coversKeyPollutantsIfExpected(log: AirQualityLog): Boolean {
-        val gainedCoverage = log.details.getSensorCoverage()
-        val expectedCoverage = log.expectedSensorCoverage
+    fun coversKeyPollutantsIfExpected(log: AirQualityLog) = coversKeyPollutantsIfExpected(
+            log.details.getSensorCoverage(),
+            log.expectedSensorCoverage,
+            log.timeStamp)
 
-        val month = getApproxMonthNumber(log.timeStamp)
+    /**
+     * Checks if the log covers the key pollutants that it has in it's expectedCoverage
+     */
+    fun coversKeyPollutantsIfExpected(gainedCoverage: SensorsPresence, expectedCoverage: SensorsPresence, timeStamp: Long): Boolean {
+        val month = getApproxMonthNumber(timeStamp)
 
         fun isExpectedButMissing(sensorFlag: Int) = expectedCoverage.hasSensors(sensorFlag) && !gainedCoverage.hasSensors(sensorFlag)
 

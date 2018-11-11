@@ -39,12 +39,13 @@ class ErrorExplanationHelperTest {
 
     @Test
     fun handlesPartialData() {
-        val log = AirQualityLog(
+        val log = AirQualityLog(airQualityIndex = 1,
                 details = PollutionDetails(0, 0, 0, 1, 0, -1, -1),
+                expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_C6H6),
                 timeStamp = 0)
 
         val result = errorExplanationHelper.explain(log)
-        val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
+        val expected = FAKE_EXPLANATION_PARTIAL_DATA
         assertEquals(expected, result)
     }
 
@@ -62,13 +63,13 @@ class ErrorExplanationHelperTest {
 
     @Test
     fun handlesPartialDataWithKeyPollutantsDataPresentAndExpectedButO3MissingAndExpected() {
-        val log = AirQualityLog(
+        val log = AirQualityLog(airQualityIndex = 0,
                 details = PollutionDetails(1, 1, -1, 0, -1, -1, 0),
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO),
                 timeStamp = getTimestampFromMonth(11, 4))
 
         val result = errorExplanationHelper.explain(log)
-        val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
+        val expected = FAKE_EXPLANATION_PARTIAL_DATA
         assertEquals(expected, result)
     }
 
@@ -98,7 +99,7 @@ class ErrorExplanationHelperTest {
 
     @Test
     fun handlesPartialDataWithO3MissingWhenRequiredAndExpected() {
-        val log = AirQualityLog(
+        val log = AirQualityLog(airQualityIndex = -1,
                 details = PollutionDetails(0, 0, -1, 0, -1, -1, -1),
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(4))
@@ -110,25 +111,25 @@ class ErrorExplanationHelperTest {
 
     @Test
     fun handlesPartialDataWithO3MissingWhenNotRequiredButExpected() {
-        val log = AirQualityLog(
+        val log = AirQualityLog(airQualityIndex = 0,
                 details = PollutionDetails(0, 0, -1, 0, -1, -1, -1),
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(12))
 
         val result = errorExplanationHelper.explain(log)
-        val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
+        val expected = FAKE_EXPLANATION_PARTIAL_DATA
         assertEquals(expected, result)
     }
 
     @Test
     fun handlesPartialDataWithO3MissingWhenRequiredButNotExpected() {
-        val log = AirQualityLog(
+        val log = AirQualityLog(airQualityIndex = -1,
                 details = PollutionDetails(0, 0, -1, 0, -1, -1, -1),
                 expectedSensorCoverage = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_NO2),
                 timeStamp = getTimestampFromMonth(4))
 
         val result = errorExplanationHelper.explain(log)
-        val expected = FAKE_EXPLANATION_PARTIAL_DATA + log.details.getHighestIndex().toString()
+        val expected = FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS + log.details.getHighestIndex().toString()
         assertEquals(expected, result)
     }
 
@@ -157,21 +158,21 @@ class ErrorExplanationHelperTest {
         `when`(mockResources.getStringArray(R.array.index_level_titles)).thenReturn(FAKE_INDEX_LEVEL_NAMES)
         `when`(mockApplication.getString(Mockito.anyInt(), Mockito.anyString())).thenAnswer { invocation ->
             val messageInt = invocation.arguments[0] as Int
-            val message = when (messageInt) {
-                R.string.error_explanation_partial_data -> FAKE_EXPLANATION_PARTIAL_DATA
-                R.string.error_explanation_partial_data_without_key_pollutants -> FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS
-                else -> throw RuntimeException("unknown resource int")
-            }
+            val message = if (messageInt == R.string.error_explanation_partial_data_without_key_pollutants) FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS
+            else throw RuntimeException("unknown resource int")
             val level = invocation.arguments[1] as String
             message + level
         }
 
-        errorExplanationHelper = ErrorExplanationHelper(SeasonalKeyPollutantsHelper(), mockApplication)
+        errorExplanationHelper = ErrorExplanationHelper(mockApplication)
     }
 
 
-
     private companion object {
+        val FAKE_INDEX_LEVEL_NAMES = arrayOf("0", "1", "2", "3", "4", "5", "9")
+        const val FAKE_EXPLANATION_PARTIAL_DATA = "P"
+        const val FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS = "PK"
+
         val FAKE_ERROR_TO_EXPLANATION_MAP = mapOf(
                 R.string.error_explanation_internet to "1",
                 R.string.error_explanation_location to "2",
@@ -179,10 +180,7 @@ class ErrorExplanationHelperTest {
                 R.string.error_explanation_stations_far_away to "4",
                 R.string.error_explanation_connection to "5",
                 R.string.error_explanation_unknown to "UNKNOWN",
-                R.string.error_explanation_server to "SERVER")
-
-        val FAKE_INDEX_LEVEL_NAMES = arrayOf("0", "1", "2", "3", "4", "5", "9")
-        const val FAKE_EXPLANATION_PARTIAL_DATA = "P"
-        const val FAKE_EXPLANATION_PARTIAL_DATA_MISSING_KEY_POLLUTANTS = "PK"
+                R.string.error_explanation_server to "SERVER",
+                R.string.error_explanation_partial_data to FAKE_EXPLANATION_PARTIAL_DATA)
     }
 }

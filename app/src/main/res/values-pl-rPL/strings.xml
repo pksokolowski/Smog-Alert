@@ -11,11 +11,12 @@
     <string name="notification_channel_data_shortage_description">Te powiadomienia pojawiają się, gdy połączenie z serwerem zostanie osiągnięte, ale nie ma on nowych danych, zwykle wskutek awarii.</string>
     <string name="notification_alerts_message">Jakość powietrza pogorszyła się</string>
     <string name="notification_improvement_message">Jakość powietrza poprawiła się</string>
+    <string name="notification_improvement_likely_message">Jakość powietrza prawdopodobnie poprawiła się</string>
     <string name="notification_data_shortage_message">Brak danych o jakości powietrza</string>
     <string name="notification_data_shortage_over_air_ok_message">Powietrze jest akceptowalne</string>
     <string name="notification_error_message">Wystąpił błąd</string>
 
-    <string name="error_explanation_partial_data">Prawdopodobnie %s ale dane są niepełne</string>
+    <string name="error_explanation_partial_data">Dane są niepełne</string>
     <string name="error_explanation_partial_data_without_key_pollutants">Brakuje kluczowych danych. Możliwe, że %s, ale prawdopodobnie jest gorzej</string>
     <string name="error_explanation_server">Brak danych na serverze</string>
     <string name="error_explanation_internet">Brak internetu</string>

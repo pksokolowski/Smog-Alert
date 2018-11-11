@@ -26,23 +26,21 @@ class AQLogsComparer {
                 else RESULT_NO_INTERPRETATION
             }
 
-            val currentHasData = current.airQualityIndex != -1
-            val previousHasData = previous.airQualityIndex != -1
             val currentReachedThreshold = meetsThreshold(current)
             val previousReachedThreshold = meetsThreshold(previous)
 
-            // special cases for partial data availability and bad index
-            if (!currentHasData
+            // special cases for poor data availability and bad index
+            if (!current.hasIndex()
                     && !previousReachedThreshold
                     && partialMeetsThreshold(current)
                     && !partialMeetsThreshold(previous)) return RESULT_DEGRADED_PAST_THRESHOLD
 
             if (currentReachedThreshold
-                    && !previousHasData
+                    && !previous.hasIndex()
                     && partialMeetsThreshold(previous)) return RESULT_NO_INTERPRETATION
 
-            if (!currentHasData && previousHasData) return RESULT_DATA_SHORTAGE_STARTED
-            if (currentHasData && !previousHasData && !currentReachedThreshold) return RESULT_OK_AFTER_SHORTAGE_ENDED
+            if (!current.hasIndex() && previous.hasIndex()) return RESULT_DATA_SHORTAGE_STARTED
+            if (current.hasExpectedCoverage() && !previous.hasExpectedCoverage() && !currentReachedThreshold) return RESULT_OK_AFTER_SHORTAGE_ENDED
 
             if (currentReachedThreshold && !previousReachedThreshold) return RESULT_DEGRADED_PAST_THRESHOLD
             if (!currentReachedThreshold && previousReachedThreshold) return RESULT_IMPROVED_PAST_THRESHOLD
