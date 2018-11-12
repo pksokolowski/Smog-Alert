@@ -4,6 +4,13 @@ import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AQLogsComparer
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_NO2
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_O3
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
+import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
 import org.junit.Assert
 import org.junit.Test
 
@@ -155,5 +162,135 @@ class AQLogsComparerTest {
 
         val result = AQLogsComparer.compare(current, previous, 4)
         Assert.assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
+    }
+
+    @Test
+    fun ignoresTransitionFromPartBadToLikelyBad() {
+        val sensors = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO
+
+        val previous = AirQualityLog(1,
+                -1,
+                PollutionDetails(9999933),
+                400,
+                0,
+                1,
+                1,
+                SensorsPresence(sensors))
+
+        val current = AirQualityLog(2,
+                3,
+                PollutionDetails(3339933),
+                400,
+                0,
+                2,
+                1,
+                SensorsPresence(sensors))
+
+        val result = AQLogsComparer.compare(current, previous, 3)
+        Assert.assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
+    }
+
+    @Test
+    fun detectsShortageWhenStartsWithCurentNotHavingKeyPollutants() {
+        val sensors = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO
+
+        val previous = AirQualityLog(1,
+                3,
+                PollutionDetails(2229222),
+                400,
+                0,
+                1,
+                1,
+                SensorsPresence(sensors))
+
+        val current = AirQualityLog(2,
+                -1,
+                PollutionDetails(9999933),
+                400,
+                0,
+                2,
+                1,
+                SensorsPresence(sensors))
+
+        val result = AQLogsComparer.compare(current, previous, 3)
+        Assert.assertEquals(AQLogsComparer.RESULT_DATA_SHORTAGE_STARTED, result)
+    }
+
+    @Test
+    fun ignoresShortageWhenItStartsWhenAirWasBadAnywayWithCurrentHavingKeyPollutants() {
+        val sensors = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO
+
+        val previous = AirQualityLog(1,
+                3,
+                PollutionDetails(3339333),
+                400,
+                0,
+                1,
+                1,
+                SensorsPresence(sensors))
+
+        val current = AirQualityLog(2,
+                3,
+                PollutionDetails(3339933),
+                400,
+                0,
+                2,
+                1,
+                SensorsPresence(sensors))
+
+        val result = AQLogsComparer.compare(current, previous, 3)
+        Assert.assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
+    }
+
+    @Test
+    fun ignoresTransitionFromLikelyBadToPartBad() {
+        val sensors = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO
+
+        val previous = AirQualityLog(1,
+                3,
+                PollutionDetails(3339933),
+                400,
+                0,
+                1,
+                1,
+                SensorsPresence(sensors))
+
+        val current = AirQualityLog(2,
+                -1,
+                PollutionDetails(9999933),
+                400,
+                0,
+                2,
+                1,
+                SensorsPresence(sensors))
+
+        val result = AQLogsComparer.compare(current, previous, 3)
+        Assert.assertEquals(AQLogsComparer.RESULT_NO_INTERPRETATION, result)
+    }
+
+    @Test
+    fun noticesShortageWhenItHidesPotentialBadAir() {
+        val sensors = FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3 or FLAG_SENSOR_SO2 or FLAG_SENSOR_C6H6 or FLAG_SENSOR_CO
+
+        val previous = AirQualityLog(1,
+                3,
+                PollutionDetails(3339933),
+                400,
+                0,
+                1,
+                1,
+                SensorsPresence(sensors))
+
+        val current = AirQualityLog(2,
+                -1,
+                PollutionDetails(9999900),
+                400,
+                0,
+                2,
+                1,
+                SensorsPresence(sensors))
+
+        val result = AQLogsComparer.compare(current, previous, 3)
+        Assert.assertEquals(AQLogsComparer.RESULT_DATA_SHORTAGE_STARTED, result)
     }
 }

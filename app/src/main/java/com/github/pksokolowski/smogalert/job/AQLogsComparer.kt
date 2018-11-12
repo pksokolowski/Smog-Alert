@@ -10,6 +10,7 @@ class AQLogsComparer {
             fun AirQualityLog.meetsThreshold() = airQualityIndex >= warningThreshold
             fun AirQualityLog.partialMeetsThreshold() = !hasIndex() && details.getHighestIndex() >= warningThreshold
             fun AirQualityLog.isLikelyOK() = errorCode == 0 && hasIndex() && !hasExpectedCoverage() && details.getHighestIndex() < warningThreshold
+            fun AirQualityLog.hasBadAir() = errorCode == 0 && details.getHighestIndex() >= warningThreshold
 
             if (previous == null) {
                 if (current.isLikelyOK()) return RESULT_LIKELY_OK
@@ -27,6 +28,7 @@ class AQLogsComparer {
             }
 
             if(current.isLikelyOK() && !previous.isLikelyOK()) return RESULT_LIKELY_OK
+            if(current.hasBadAir() && previous.hasBadAir()) return RESULT_NO_INTERPRETATION
 
             // special cases for poor data availability and bad index
             if (!previous.meetsThreshold()
