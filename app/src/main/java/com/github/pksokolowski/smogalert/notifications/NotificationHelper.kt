@@ -107,7 +107,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     }
 
     fun showError() {
-        val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
+        val b = NotificationCompat.Builder(context, CHANNEL_ID_ERRORS)
                 .setContentText(context.getString(R.string.notification_error_message))
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
