@@ -62,11 +62,11 @@ class AirQualityLogsRepositoryTest {
     fun returnsLogWithCorrectErrorWhenSensorsDataWasNotAvailableDueToConnectionOrServerIssues() {
         val pack = MockPack(
                 mapOf(
-                        Station(1, 0, 50.0, 20.0) to makeLog(4499999)
+                        Station(1, 0, 50.0, 20.0) to makeLog(9999999, null, null)
                 )
                 ,
                 stationSensorsById = mapOf(
-                        1L to 0
+                        1L to null
                 ))
 
         val freshLog = pack.airQualityLogsRepo.getLatestLogData().log
@@ -87,6 +87,46 @@ class AirQualityLogsRepositoryTest {
         )
         val log = pack.airQualityLogsRepo.getLatestLogData().log
         assertEquals("incorrect fusion of stations", 2222222, log.details.encode())
+    }
+
+    @Test
+    fun combinesDataFromMultipleStationsToFillPartialShortagesOnPreviousStations_WithOneStationHavingCeasedToExistAndThusHavingNoSensors() {
+        val pack = MockPack(
+                mapOf(
+                        Station(1, 0, 50.0, 20.001) to makeLog(9999999, null, null),
+                        Station(2, 0, 50.0, 20.002) to makeLog(3399922),
+                        Station(3, 0, 50.0, 20.003) to makeLog(9922299)
+                )
+                ,
+                stationSensorsById = mapOf(
+                        1L to null,
+                        2L to 127,
+                        3L to 127
+                )
+        )
+
+        val log = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals(3322222, log.details.encode())
+    }
+
+    @Test
+    fun showsUncertaintyAboutCoverageWhenOneStationWentInexistentWithUnknownSensors() {
+        val pack = MockPack(
+                mapOf(
+                        Station(1, 0, 50.0, 20.001) to makeLog(9999999, null, null),
+                        Station(2, 0, 50.0, 20.002) to makeLog(3399999),
+                        Station(3, 0, 50.0, 20.003) to makeLog(9922999)
+                )
+                ,
+                stationSensorsById = mapOf(
+                        1L to null,
+                        2L to (FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25),
+                        3L to (FLAG_SENSOR_O3 or FLAG_SENSOR_NO2)
+                )
+        )
+
+        val log = pack.airQualityLogsRepo.getLatestLogData().log
+        assertEquals(SensorsPresence.getFullCoverage(), log.expectedSensorCoverage)
     }
 
     @Test
@@ -234,7 +274,7 @@ class AirQualityLogsRepositoryTest {
             cachedAQLogs: MutableList<AirQualityLog> = mutableListOf(),
             deviceLatitude: Double = 50.0,
             deviceLongitude: Double = 20.0,
-            val stationSensorsById: Map<Long, Int> = stationModelMap.keys.map { it.id to 127 }.toMap(),
+            val stationSensorsById: Map<Long, Int?> = stationModelMap.keys.map { it.id to 127 }.toMap(),
             var locationResult: LocationHelper.LocationResult = LocationHelper.LocationResult(Location("loc").apply { latitude = deviceLatitude; longitude = deviceLongitude }, LocationHelper.SUCCESS, false),
             var netAvailable: Boolean = true,
             val monthOfYear: Int = 2) {
@@ -261,7 +301,7 @@ class AirQualityLogsRepositoryTest {
                 val gainedCoverage = it.arguments[0] as SensorsPresence
                 actualSeasonalHelper.includeKeyPollutants(gainedCoverage, getTimestampFromMonth(monthOfYear))
             }
-            `when`(mock.coversKeyPollutantsIfExpected(anything(), anything(), anyLong())).then{
+            `when`(mock.coversKeyPollutantsIfExpected(anything(), anything(), anyLong())).then {
                 val gainedCoverage = it.arguments[0] as SensorsPresence
                 val expectedCoverage = it.arguments[1] as SensorsPresence
                 actualSeasonalHelper.coversKeyPollutantsIfExpected(gainedCoverage, expectedCoverage, getTimestampFromMonth(monthOfYear))
@@ -291,9 +331,8 @@ class AirQualityLogsRepositoryTest {
 
         private fun fetchStationWithSensors(id: Long): Station? {
             val station = stationModelMap.keys.filter { it.id == id }.getOrElse(0) { return null }
-            val sensors = stationSensorsById[station.id]
-                    ?: throw RuntimeException("requested sensors for station which did not have any assigned")
-            if(sensors == 0) return null
+            val sensors = stationSensorsById[station.id] ?: 0
+            if (sensors == 0) return null
             return station.assignSensors(sensors)
         }
 

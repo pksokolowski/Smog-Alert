@@ -89,8 +89,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                 s.sensorFlags
             } else {
                 stationsRepository.fetchSensorsData(s.id)?.sensorFlags
-                        ?: return AirQualityLog(errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
-                                timeStamp = timeStamp, metadata = flags)
+                        ?: SensorsPresence.getFullCoverage().sensorFlags
             }
 
             if (gainedCoverage.hasSensors(sensors)) continue

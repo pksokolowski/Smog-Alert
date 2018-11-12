@@ -18,6 +18,8 @@ data class SensorsPresence(val sensorFlags: Int = 0) {
 
         fun combineSensors(A: Int, B: Int) = A or B
 
+        fun getFullCoverage() = SensorsPresence(FULL_COVERAGE_VALUE)
+
         const val FLAG_SENSOR_PM10 = 1
         const val FLAG_SENSOR_PM25 = 2
         const val FLAG_SENSOR_O3 = 4
