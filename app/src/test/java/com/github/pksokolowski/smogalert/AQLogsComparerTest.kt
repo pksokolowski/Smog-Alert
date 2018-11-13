@@ -126,12 +126,39 @@ class AQLogsComparerTest {
     }
 
     @Test
+    fun detectsPartialDataShortageEndWhenAirIsOk() {
+        val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1, details = PollutionDetails(9995599), expectedSensorCoverage = SensorsPresence(127))
+        val current = AirQualityLog(id = 2, airQualityIndex = 3, timeStamp = 2, details = PollutionDetails(1111111), expectedSensorCoverage = SensorsPresence(127))
+
+        val result = AQLogsComparer.compare(current, previous, 4)
+        Assert.assertEquals(AQLogsComparer.RESULT_OK_AFTER_SHORTAGE_ENDED, result)
+    }
+
+    @Test
+    fun detectsPartialDataShortageEndWhenAirIsBadAndWasPartOk() {
+        val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1, details = PollutionDetails(9990099), expectedSensorCoverage = SensorsPresence(127))
+        val current = AirQualityLog(id = 2, airQualityIndex = 5, timeStamp = 2, details = PollutionDetails(1115511), expectedSensorCoverage = SensorsPresence(127))
+
+        val result = AQLogsComparer.compare(current, previous, 4)
+        Assert.assertEquals(AQLogsComparer.RESULT_BAD_AFTER_SHORTAGE_ENDED, result)
+    }
+
+    @Test
+    fun detectsDegradationWhenAirIsBadAndWasLikelyOk() {
+        val previous = AirQualityLog(id = 1, airQualityIndex = 1, timeStamp = 1, details = PollutionDetails(1000099), expectedSensorCoverage = SensorsPresence(127))
+        val current = AirQualityLog(id = 2, airQualityIndex = 5, timeStamp = 2, details = PollutionDetails(1115511), expectedSensorCoverage = SensorsPresence(127))
+
+        val result = AQLogsComparer.compare(current, previous, 4)
+        Assert.assertEquals(AQLogsComparer.RESULT_DEGRADED_PAST_THRESHOLD, result)
+    }
+
+    @Test
     fun detectsBadAirRightAfterDataShortage() {
         val previous = AirQualityLog(id = 1, airQualityIndex = -1, timeStamp = 1, details = PollutionDetails(9999999), expectedSensorCoverage = SensorsPresence(127))
         val current = AirQualityLog(id = 2, airQualityIndex = 5, timeStamp = 2, details = PollutionDetails(5555555), expectedSensorCoverage = SensorsPresence(127))
 
         val result = AQLogsComparer.compare(current, previous, 4)
-        Assert.assertEquals(AQLogsComparer.RESULT_DEGRADED_PAST_THRESHOLD, result)
+        Assert.assertEquals(AQLogsComparer.RESULT_BAD_AFTER_SHORTAGE_ENDED, result)
     }
 
     @Test

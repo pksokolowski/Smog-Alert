@@ -14,10 +14,10 @@ class AQLogsComparer {
 
             if (previous == null) {
                 if (current.isLikelyOK()) return RESULT_LIKELY_OK
-                if (current.partialMeetsThreshold()) return RESULT_DEGRADED_PAST_THRESHOLD
+                if (current.partialMeetsThreshold()) return RESULT_BAD_AFTER_SHORTAGE_ENDED
                 if (current.errorCode > 0) return interpretErrorCode(current.errorCode)
                 if (current.airQualityIndex == -1) return RESULT_DATA_SHORTAGE_STARTED
-                if (current.meetsThreshold()) return RESULT_DEGRADED_PAST_THRESHOLD
+                if (current.meetsThreshold()) return RESULT_BAD_AFTER_SHORTAGE_ENDED
 
                 return RESULT_NO_INTERPRETATION
             }
@@ -29,6 +29,7 @@ class AQLogsComparer {
 
             if(current.isLikelyOK() && !previous.isLikelyOK()) return RESULT_LIKELY_OK
             if(current.hasBadAir() && previous.hasBadAir()) return RESULT_NO_INTERPRETATION
+            if(current.hasBadAir() && !previous.hasIndex()) return RESULT_BAD_AFTER_SHORTAGE_ENDED
 
             // special cases for poor data availability and bad index
             if (!previous.meetsThreshold()
@@ -57,6 +58,7 @@ class AQLogsComparer {
         const val RESULT_OK_AFTER_SHORTAGE_ENDED = 3
         const val RESULT_ERROR_EMERGED = 4
         const val RESULT_LIKELY_OK = 5
+        const val RESULT_BAD_AFTER_SHORTAGE_ENDED = 6
         const val RESULT_DATA_SHORTAGE_STARTED = 7
     }
 }

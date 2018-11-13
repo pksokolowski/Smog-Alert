@@ -4,6 +4,7 @@ import com.github.pksokolowski.smogalert.AQLogsComparerExhaustiveTest.SimpleAQLo
 import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AQLogsComparer
+import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_BAD_AFTER_SHORTAGE_ENDED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DATA_SHORTAGE_STARTED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DEGRADED_PAST_THRESHOLD
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_ERROR_EMERGED
@@ -23,20 +24,20 @@ class AQLogsComparerExhaustiveTest {
         runCases(
                 Case(NULL, PART_OK, RESULT_DATA_SHORTAGE_STARTED),
                 Case(NULL, LIKELY_OK, RESULT_LIKELY_OK),
-                Case(NULL, PART_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
-                Case(NULL, LIKELY_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(NULL, PART_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
+                Case(NULL, LIKELY_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(NULL, OK, RESULT_NO_INTERPRETATION),
-                Case(NULL, BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(NULL, BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(NULL, UNKNOWN, RESULT_DATA_SHORTAGE_STARTED),
                 Case(NULL, NULL, RESULT_NO_INTERPRETATION),
                 Case(NULL, ERROR, RESULT_ERROR_EMERGED),
 
                 Case(PART_OK, PART_OK, RESULT_NO_INTERPRETATION),
                 Case(PART_OK, LIKELY_OK, RESULT_LIKELY_OK),
-                Case(PART_OK, PART_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
-                Case(PART_OK, LIKELY_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(PART_OK, PART_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
+                Case(PART_OK, LIKELY_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(PART_OK, OK, RESULT_OK_AFTER_SHORTAGE_ENDED),
-                Case(PART_OK, BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(PART_OK, BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(PART_OK, UNKNOWN, RESULT_NO_INTERPRETATION),
                 Case(PART_OK, NULL, RESULT_NO_INTERPRETATION),
                 Case(PART_OK, ERROR, RESULT_ERROR_EMERGED),
@@ -93,20 +94,20 @@ class AQLogsComparerExhaustiveTest {
 
                 Case(UNKNOWN, PART_OK, RESULT_NO_INTERPRETATION),
                 Case(UNKNOWN, LIKELY_OK, RESULT_LIKELY_OK),
-                Case(UNKNOWN, PART_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
-                Case(UNKNOWN, LIKELY_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(UNKNOWN, PART_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
+                Case(UNKNOWN, LIKELY_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(UNKNOWN, OK, RESULT_OK_AFTER_SHORTAGE_ENDED),
-                Case(UNKNOWN, BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(UNKNOWN, BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(UNKNOWN, UNKNOWN, RESULT_NO_INTERPRETATION),
                 Case(UNKNOWN, NULL, RESULT_NO_INTERPRETATION),
                 Case(UNKNOWN, ERROR, RESULT_ERROR_EMERGED),
 
                 Case(ERROR, PART_OK, RESULT_NO_INTERPRETATION),
                 Case(ERROR, LIKELY_OK, RESULT_LIKELY_OK),
-                Case(ERROR, PART_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
-                Case(ERROR, LIKELY_BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(ERROR, PART_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
+                Case(ERROR, LIKELY_BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(ERROR, OK, RESULT_OK_AFTER_SHORTAGE_ENDED),
-                Case(ERROR, BAD, RESULT_DEGRADED_PAST_THRESHOLD),
+                Case(ERROR, BAD, RESULT_BAD_AFTER_SHORTAGE_ENDED),
                 Case(ERROR, UNKNOWN, RESULT_NO_INTERPRETATION),
                 Case(ERROR, NULL, RESULT_NO_INTERPRETATION),
                 Case(ERROR, ERROR, RESULT_NO_INTERPRETATION)
@@ -148,6 +149,7 @@ class AQLogsComparerExhaustiveTest {
         RESULT_IMPROVED_PAST_THRESHOLD -> "IMPROVED_PAST_THRESHOLD"
         RESULT_LIKELY_OK -> "RESULT_LIKELY_OK"
         RESULT_OK_AFTER_SHORTAGE_ENDED -> "RESULT_OK_AFTER_SHORTAGE_ENDED"
+        RESULT_BAD_AFTER_SHORTAGE_ENDED -> "RESULT_BAD_AFTER_SHORTAGE_ENDED"
         RESULT_ERROR_EMERGED -> "RESULT_ERROR_EMERGED"
         RESULT_DATA_SHORTAGE_STARTED -> "RESULT_DATA_SHORTAGE_STARTED"
         else -> "unknownCode"

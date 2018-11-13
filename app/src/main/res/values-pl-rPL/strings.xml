@@ -10,6 +10,7 @@
     <string name="notification_channel_data_shortage_title">Braki danych</string>
     <string name="notification_channel_data_shortage_description">Te powiadomienia pojawiają się, gdy połączenie z serwerem zostanie osiągnięte, ale nie ma on nowych danych, zwykle wskutek awarii.</string>
     <string name="notification_alerts_message">Jakość powietrza pogorszyła się</string>
+    <string name="notification_alerts_shortage_over_air_bad_message">Powietrze jest zanieczyszczone</string>
     <string name="notification_improvement_message">Jakość powietrza poprawiła się</string>
     <string name="notification_likely_ok_message">Powietrze jest prawdopodobnie akceptowalne</string>
     <string name="notification_data_shortage_message">Brak danych o jakości powietrza</string>
