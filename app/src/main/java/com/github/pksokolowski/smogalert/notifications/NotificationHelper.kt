@@ -27,6 +27,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setPriority(Notification.PRIORITY_MAX)
                 .setColor(Color.RED)
                 .setLights(Color.RED, LIGHTS_ON_TIME, LIGHT_OFF_TIME)
                 .setContentIntent(getOpenMainActivityPendingIntent(context))
