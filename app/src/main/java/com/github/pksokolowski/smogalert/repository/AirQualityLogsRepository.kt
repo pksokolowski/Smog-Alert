@@ -77,6 +77,23 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
                     timeStamp = timeStamp, metadata = flags)
         }
 
+        // checks for timeout condition and if execution took too long already,
+        // returns a timeout log, suitable for returning for the enclosing function.
+        // when it's not too late, null is returned instead.
+        fun getTimeoutLogIfItsTooLate(): AirQualityLog? {
+            val now = Calendar.getInstance().timeInMillis
+            if (now - timeStamp > TIMEOUT) {
+                return AirQualityLog(
+                        errorCode = ERROR_CODE_AIR_QUALITY_MISSING,
+                        timeStamp = timeStamp,
+                        metadata = flags)
+            }
+            return null
+        }
+        // intended usage of the above function
+        getTimeoutLogIfItsTooLate()?.let { return it }
+
+
         var details = PollutionDetails()
         var gainedCoverage = SensorsPresence()
         var expectedCoverage = SensorsPresence()
@@ -88,6 +105,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             val sensors = if (s.sensorFlags > 0) {
                 s.sensorFlags
             } else {
+                getTimeoutLogIfItsTooLate()?.let { return it }
                 stationsRepository.fetchSensorsData(s.id)?.sensorFlags
                         ?: SensorsPresence.getFullCoverage().sensorFlags
             }
@@ -95,6 +113,7 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
             if (gainedCoverage.hasSensors(sensors)) continue
             expectedCoverage = expectedCoverage.combinedWith(sensors)
 
+            getTimeoutLogIfItsTooLate()?.let { return it }
             val log = getLogFromAPI(s.id, timeStamp)
             if(log.errorCode > 0) lastErrorsCode = log.errorCode
 
@@ -175,5 +194,6 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         const val ACCEPTABLE_DISTANCE_TO_STATION = 10000F
 
         const val MAX_STATION_REQUESTS = 10
+        const val TIMEOUT = 50 * (1000) /* 50 * (a second) */
     }
 }
