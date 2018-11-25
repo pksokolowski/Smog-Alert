@@ -6,12 +6,18 @@ import android.arch.lifecycle.ViewModel
 import android.os.AsyncTask
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
+import com.github.pksokolowski.smogalert.job.SettingsValidator
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(private val airQualityLogsRepository: AirQualityLogsRepository,
-                                                private val jobsHelper: JobsHelper) : ViewModel() {
+                                                private val jobsHelper: JobsHelper,
+                                                settingsValidator: SettingsValidator) : ViewModel() {
+
+    init {
+        settingsValidator.validate()
+    }
 
     private val airQualityInfo = airQualityLogsRepository.getCachedLog()
     private val isDownloadInProgress = MutableLiveData<Boolean>()

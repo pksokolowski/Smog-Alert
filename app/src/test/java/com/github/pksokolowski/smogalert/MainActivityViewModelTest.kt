@@ -6,6 +6,7 @@ import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
+import com.github.pksokolowski.smogalert.job.SettingsValidator
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
 import org.junit.Assert.assertEquals
@@ -88,6 +89,9 @@ class MainActivityViewModelTest {
     @Mock
     private lateinit var mockAirQualityLogsRepository: AirQualityLogsRepository
 
+    @Mock
+    private lateinit var mockSettingsValidator: SettingsValidator
+
     private val cacheLiveData = MutableLiveData<AirQualityLog?>()
 
     companion object {
@@ -115,6 +119,6 @@ class MainActivityViewModelTest {
         `when`(mockAirQualityLogsRepository.getCachedLog()).thenReturn(cacheLiveData)
         `when`(mockAirQualityLogsRepository.getLatestLogData()).thenAnswer { downloadNewLog() }
         `when`(mockJobsHelper.getAirCheckParams()).thenReturn(airCheckParams)
-        viewModel = MainActivityViewModel(mockAirQualityLogsRepository, mockJobsHelper)
+        viewModel = MainActivityViewModel(mockAirQualityLogsRepository, mockJobsHelper, mockSettingsValidator)
     }
 }

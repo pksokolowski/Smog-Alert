@@ -10,7 +10,7 @@
 
     <application
         android:name=".di.App"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -33,6 +33,13 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.github.pksokolowski.smogalert.action_process_location_update" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".job.BootFinishedReceiver"
+            android:enabled="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
     </application>

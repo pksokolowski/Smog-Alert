@@ -10,14 +10,17 @@ import com.github.pksokolowski.smogalert.di.PerApp
 import javax.inject.Inject
 
 @PerApp
-class JobsHelper @Inject constructor(private val context: Application) {
+class JobsHelper @Inject constructor(private val context: Application,
+                                     private val settingsBackupHelper: SettingsBackupHelper) {
     private val jobScheduler = context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
 
-    fun scheduleAirQualityCheckJob(airCheckParams: AirCheckParams): Boolean {
-        if(airCheckParams.isOneTimeRetry){
+    fun scheduleAirQualityCheckJob(airCheckParams: AirCheckParams, cancelPendingRetryJobs: Boolean = true): Boolean {
+        if (airCheckParams.isOneTimeRetry) {
             return scheduleOneTimeRetry(airCheckParams)
         }
-        jobScheduler.cancel(RETRY_JOB_ID)
+        if (cancelPendingRetryJobs) jobScheduler.cancel(RETRY_JOB_ID)
+
+        settingsBackupHelper.saveSensitivity(airCheckParams.sensitivity)
 
         if (airCheckParams.sensitivity == 0) {
             jobScheduler.cancel(PERIODIC_JOB_ID)
@@ -26,12 +29,13 @@ class JobsHelper @Inject constructor(private val context: Application) {
 
         val jobInfo = JobInfo.Builder(PERIODIC_JOB_ID, ComponentName(context, AirQualityCheckJobService::class.java))
                 .setPeriodic(PERIOD, FLEX)
-                .setPersisted(true)
+                .setPersisted(false)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setExtras(airCheckParams.getExtras())
                 .build()
 
         val result = jobScheduler.schedule(jobInfo)
+
         return result == RESULT_SUCCESS
     }
 
