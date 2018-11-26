@@ -28,6 +28,7 @@
     <string name="error_explanation_unknown">Nieznany błąd</string>
     <string name="air_quality_header">Jakość powietrza</string>
     <string name="sensitivity_setting_title">Poziom ostrzegania:</string>
+    <string name="main_seeker_content_description">Poziom ostrzegania. Im wyższy poziom tego ustawienia, tym mniejsze zanieczyszczenie powietrza wystarcza by aplikacja pokazała ostrzeżenie. Sprawdź opis wybranego poziomu zaraz powyżej.</string>
 
     <array name="index_level_titles">
         <item>Bardzo dobra</item>

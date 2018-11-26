@@ -27,6 +27,7 @@
     <string name="error_explanation_unknown">Unknown error</string>
     <string name="air_quality_header">Air Quality</string>
     <string name="sensitivity_setting_title">Warning Level:</string>
+    <string name="main_seeker_content_description">Warning level. The higher the setting, the less air pollution is needed to trigger a warning. Check description of the selected level right above this seeker.</string>
 
     <array name="index_level_titles">
         <item>Very good</item>
