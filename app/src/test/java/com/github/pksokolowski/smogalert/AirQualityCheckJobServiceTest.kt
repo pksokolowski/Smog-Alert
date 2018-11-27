@@ -121,8 +121,6 @@ class AirQualityCheckJobServiceTest {
 
     @Before
     fun setup() {
-        //doNothing().`when`(jobService).onCreate()
-        `when`(jobService.jobFinished(any(), ArgumentMatchers.anyBoolean())).then { }
         jobService.airQualityLogsRepository = mockAirQualityLogsRepository
         jobService.jobsHelper = mockJobsHelper
         jobService.notificationHelper = mockNotificationHelper
