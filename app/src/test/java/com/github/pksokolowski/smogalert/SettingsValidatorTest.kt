@@ -7,6 +7,7 @@ import com.github.pksokolowski.smogalert.job.SettingsValidator
 import com.github.pksokolowski.smogalert.utils.anything
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
@@ -18,7 +19,7 @@ class SettingsValidatorTest {
     fun changesNothingIfEverythingIsCorrect() {
         setup(3, 3)
         validator.validate()
-        verify(jobsHelper, never()).scheduleAirQualityCheckJob(anything())
+        verify(jobsHelper, never()).scheduleAirQualityCheckJob(anything(), anyBoolean())
         verify(settingsBackupHelper, never()).saveSensitivity(anyInt())
     }
 
@@ -26,7 +27,7 @@ class SettingsValidatorTest {
     fun changesActiveSettingIfWrong() {
         setup(0, 2)
         validator.validate()
-        verify(jobsHelper).scheduleAirQualityCheckJob(AirCheckParams(2, false))
+        verify(jobsHelper).scheduleAirQualityCheckJob(AirCheckParams(2, false), false)
     }
 
     @Mock
