@@ -10,6 +10,7 @@ import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_N
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_NO_KNOWN_STATIONS
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_STATIONS_TOO_FAR_AWAY
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.ERROR_CODE_SUCCESS
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_BACKGROUND_REQUEST
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_USED_ACTIVE_LOCATION_METHOD
 import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_USED_API
 import com.github.pksokolowski.smogalert.db.AirQualityLogsDao
@@ -32,13 +33,15 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
     class LogData(val log: AirQualityLog, val isFromCache: Boolean)
 
     @Synchronized
-    fun getLatestLogData(): LogData {
+    fun getLatestLogData(initialFlags: Int = 0): LogData {
         val timeNow = Calendar.getInstance().timeInMillis
         val latestCachedLog = airQualityLogsDao.getLatestAirQualityLog()
         if (latestCachedLog == null
                 || latestCachedLog.timeStamp < timeNow - ACCEPTABLE_LOG_AGE
-                || !latestCachedLog.hasFlags(FLAG_USED_API)) {
-            val freshLog = fetchFreshLog(timeNow)
+                || !latestCachedLog.hasFlags(FLAG_USED_API)
+                || (latestCachedLog.hasFlags(FLAG_BACKGROUND_REQUEST) && latestCachedLog.errorCode > 0)
+        ) {
+            val freshLog = fetchFreshLog(timeNow, initialFlags)
             val logId = airQualityLogsDao.insertAirQualityLog(freshLog)
             return LogData(freshLog.assignId(logId), false)
         }
@@ -47,8 +50,8 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
 
     class LogsData(val logs: List<AirQualityLog>, val isLatestFromCache: Boolean)
 
-    fun getNLatestLogs(n: Int): LogsData {
-        val isLatestFromCache = getLatestLogData().isFromCache
+    fun getNLatestLogs(n: Int, initialFlags: Int = 0): LogsData {
+        val isLatestFromCache = getLatestLogData(initialFlags).isFromCache
         return LogsData(airQualityLogsDao.getNLatestLogs(n), isLatestFromCache)
     }
 
@@ -56,8 +59,8 @@ class AirQualityLogsRepository @Inject constructor(private val airQualityLogsDao
         return airQualityLogsDao.getLatestCachedAirQualityLog()
     }
 
-    private fun fetchFreshLog(timeStamp: Long): AirQualityLog {
-        var flags = 0
+    private fun fetchFreshLog(timeStamp: Long, initialFlags: Int = 0): AirQualityLog {
+        var flags = initialFlags
         if (!connectionChecker.isConnectionAvailable()) {
             return AirQualityLog(errorCode = ERROR_CODE_NO_INTERNET,
                     timeStamp = timeStamp, metadata = flags)

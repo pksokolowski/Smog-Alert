@@ -2,6 +2,7 @@ package com.github.pksokolowski.smogalert
 
 import android.app.job.JobParameters
 import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_BACKGROUND_REQUEST
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.AirQualityCheckJobService
@@ -125,7 +126,7 @@ class AirQualityCheckJobServiceTest {
         jobService.jobsHelper = mockJobsHelper
         jobService.notificationHelper = mockNotificationHelper
 
-        `when`(mockAirQualityLogsRepository.getNLatestLogs(3)).then {
+        `when`(mockAirQualityLogsRepository.getNLatestLogs(3, FLAG_BACKGROUND_REQUEST)).then {
             val logs = listOf(current, previous, third)
             val list = mutableListOf<AirQualityLog>()
             for (log in logs) {

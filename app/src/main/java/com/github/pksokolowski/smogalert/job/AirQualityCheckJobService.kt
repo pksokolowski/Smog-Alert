@@ -5,7 +5,7 @@ import android.app.job.JobService
 import android.content.Context
 import android.os.AsyncTask
 import android.os.PowerManager
-import com.github.pksokolowski.smogalert.db.AirQualityLog
+import com.github.pksokolowski.smogalert.db.AirQualityLog.Companion.FLAG_BACKGROUND_REQUEST
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_BAD_AFTER_SHORTAGE_ENDED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DATA_SHORTAGE_STARTED
 import com.github.pksokolowski.smogalert.job.AQLogsComparer.Companion.RESULT_DEGRADED_PAST_THRESHOLD
@@ -65,7 +65,7 @@ class AirQualityCheckJobService : JobService() {
             }
 
             override fun doInBackground(vararg p0: Void?): LogsData {
-                return airQualityLogsRepository.getNLatestLogs(3)
+                return airQualityLogsRepository.getNLatestLogs(3, FLAG_BACKGROUND_REQUEST)
             }
 
             override fun onPostExecute(data: LogsData) {
@@ -98,12 +98,7 @@ class AirQualityCheckJobService : JobService() {
                         if (checkParams.isOneTimeRetry) {
                             notificationHelper.showError()
                         } else {
-                            // if API was used, show error, otherwise schedule a retry
-                            if (current?.hasFlags(AirQualityLog.FLAG_USED_API) == true) {
-                                notificationHelper.showError()
-                            } else {
-                                jobsHelper.scheduleOneTimeRetry(checkParams.sensitivity)
-                            }
+                            jobsHelper.scheduleOneTimeRetry(checkParams.sensitivity)
                         }
                     else -> {
                     }
