@@ -86,8 +86,6 @@ class AirQualityCheckJobService : JobService() {
                 val comparisonResult = AQLogsComparer.compare(current, comparisonPoint, warningIndexLevel)
 
                 when (comparisonResult) {
-                    // do not reschedule the periodic job here, if it's a one time retry,
-                    // it would cancel this job immediately
                     RESULT_DEGRADED_PAST_THRESHOLD -> notificationHelper.showAlert()
                     RESULT_IMPROVED_PAST_THRESHOLD -> notificationHelper.showImprovement()
                     RESULT_LIKELY_OK -> notificationHelper.showLikelyOk()
@@ -112,6 +110,5 @@ class AirQualityCheckJobService : JobService() {
         task?.execute()
         return false
     }
-
 
 }
