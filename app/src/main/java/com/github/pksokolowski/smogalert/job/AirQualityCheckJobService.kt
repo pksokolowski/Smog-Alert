@@ -61,6 +61,7 @@ class AirQualityCheckJobService : JobService() {
 
             override fun onPreExecute() {
                 super.onPreExecute()
+                wakeLock?.setReferenceCounted(false)
                 wakeLock?.acquire(70000)
             }
 
