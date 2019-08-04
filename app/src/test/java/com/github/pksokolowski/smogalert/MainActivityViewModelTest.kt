@@ -9,14 +9,21 @@ import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.job.SettingsValidator
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
-import org.junit.rules.TestRule
-import org.junit.Rule
 
 @RunWith(MockitoJUnitRunner::class)
 class MainActivityViewModelTest {
@@ -32,19 +39,20 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun downloadsDataFromAPIWhenRequested() {
+    fun downloadsDataFromAPIWhenRequested() = runBlocking {
         val expected = AirQualityLog(2, 2, PollutionDetails(9999992), 550, 0, 2, 1)
         var returned: AirQualityLog? = null
 
         setup(nextLogData = LogData(expected, false))
         viewModel.getAirQualityInfo().observeForever { returned = it }
 
-        viewModel.checkCurrentAirQuality()
+        viewModel.checkCurrentAirQuality().join()
+
         assertEquals(expected, returned)
     }
 
     @Test
-    fun downloadStatusIsChangingAsExpected() {
+    fun downloadStatusIsChangingAsExpected() = runBlocking {
         setup()
 
         // there is no additional false at the beginning
@@ -56,7 +64,8 @@ class MainActivityViewModelTest {
         viewModel.getDownloadStatus().observeForever {
             if (it != null) actualSequence.add(it)
         }
-        viewModel.checkCurrentAirQuality()
+
+        viewModel.checkCurrentAirQuality().join()
 
         assertEquals(expectedSequence, actualSequence)
     }
@@ -121,4 +130,18 @@ class MainActivityViewModelTest {
         `when`(mockJobsHelper.getAirCheckParams()).thenReturn(airCheckParams)
         viewModel = MainActivityViewModel(mockAirQualityLogsRepository, mockJobsHelper, mockSettingsValidator)
     }
+
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
+    }
+
 }

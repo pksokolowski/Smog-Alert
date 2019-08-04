@@ -30,22 +30,19 @@ class MainActivityViewModel @Inject constructor(private val airQualityLogsReposi
     fun getDownloadStatus() = isDownloadInProgress as LiveData<Boolean>
     fun getSensitivity() = sensitivity as LiveData<Int>
 
-    fun checkCurrentAirQuality() {
+    fun checkCurrentAirQuality() = GlobalScope.launch(Dispatchers.Main) {
         isDownloadInProgress.value = true
-        GlobalScope.launch {
+        withContext(Dispatchers.Default) {
             val result = airQualityLogsRepository.getLatestLogData()
             if (!result.isFromCache) jobsHelper.reschedule()
-            withContext(Dispatchers.Main) {
-                isDownloadInProgress.value = false
-            }
         }
+        isDownloadInProgress.value = false
     }
 
     fun setSensitivity(sensitivity: Int) {
         val params = AirCheckParams(sensitivity)
         jobsHelper.scheduleAirQualityCheckJob(params)
         this.sensitivity.value = sensitivity
-        checkCurrentAirQuality()
     }
 
 }

@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, value: Int, fromUser: Boolean) {
                 if (!fromUser) return
                 viewModel.setSensitivity(value)
+                viewModel.checkCurrentAirQuality()
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}
