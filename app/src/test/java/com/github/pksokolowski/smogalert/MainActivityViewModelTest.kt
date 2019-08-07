@@ -1,7 +1,7 @@
 package com.github.pksokolowski.smogalert
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.MutableLiveData
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.job.AirCheckParams

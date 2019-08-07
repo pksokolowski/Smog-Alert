@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 @Dao
 interface StationsUpdateLogsDao {

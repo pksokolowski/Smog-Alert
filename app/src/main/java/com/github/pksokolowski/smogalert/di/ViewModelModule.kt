@@ -1,7 +1,7 @@
 package com.github.pksokolowski.smogalert.di
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.github.pksokolowski.smogalert.MainActivityViewModel
 import com.github.pksokolowski.smogalert.viewmodel.ViewModelFactory
 import dagger.Binds

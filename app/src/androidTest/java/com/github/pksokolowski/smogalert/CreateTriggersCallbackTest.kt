@@ -1,9 +1,9 @@
 package com.github.pksokolowski.smogalert
 
-import android.arch.persistence.db.SimpleSQLiteQuery
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.room.Room
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnit4
 import com.github.pksokolowski.smogalert.db.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail

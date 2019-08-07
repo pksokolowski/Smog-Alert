@@ -1,6 +1,6 @@
 package com.github.pksokolowski.smogalert.repository
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import android.location.Location
 import com.github.pksokolowski.smogalert.api.AirQualityService
 import com.github.pksokolowski.smogalert.db.AirQualityLog

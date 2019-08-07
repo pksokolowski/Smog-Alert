@@ -1,7 +1,7 @@
 package com.github.pksokolowski.smogalert.db
 
-import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room.RoomDatabase
 
 object CreateTriggersCallback: RoomDatabase.Callback(){
     override fun onOpen(db: SupportSQLiteDatabase) {
