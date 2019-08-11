@@ -51,21 +51,25 @@ class AirQualityCheckJobService : JobService() {
 
     fun launchAQCheck(jobParams: JobParameters): Job {
         val checkParams = AirCheckParams(jobParams.extras)
+
         // an explicit wakelock is used, instead of the jobScheduler's one, in order not to
         // stop the execution if preferred conditions are no longer met for it.
         // the null safety was introduced mainly to prevent tests from breaking.
         val wakeLock: PowerManager.WakeLock? =
                 (getSystemService(Context.POWER_SERVICE) as? PowerManager)?.run {
-                    newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "com.github.pksokolowski.smogalert::AirQualityUpdate")
+                    newWakeLock(
+                            PowerManager.PARTIAL_WAKE_LOCK,
+                            "com.github.pksokolowski.smogalert::AirQualityUpdate"
+                    )?.also {
+                        it.setReferenceCounted(false)
+                        it.acquire(70000)
+                    }
                 }
-
-
-        wakeLock?.setReferenceCounted(false)
-        wakeLock?.acquire(70000)
 
         return GlobalScope.launch(Dispatchers.IO) {
             val data = airQualityLogsRepository.getNLatestLogs(3, FLAG_BACKGROUND_REQUEST)
-            // if the latest log comes from cache, it is assumed that the user
+
+            // if the latest log comes from cache, it is assumed that the us
             // had already interacted with it, and it's old news by now.
             if (data.isLatestFromCache) {
                 wakeLock?.release()
