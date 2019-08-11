@@ -32,7 +32,7 @@ class MainActivityViewModel @Inject constructor(private val airQualityLogsReposi
 
     fun checkCurrentAirQuality() = GlobalScope.launch(Dispatchers.Main) {
         isDownloadInProgress.value = true
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             val result = airQualityLogsRepository.getLatestLogData()
             if (!result.isFromCache) jobsHelper.reschedule()
         }
