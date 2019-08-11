@@ -15,7 +15,7 @@ class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasB
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
 
     @Inject
-    lateinit var dispatchingFragmentInjector: DispatchingAndroidInjector<androidx.fragment.app.Fragment>
+    lateinit var dispatchingFragmentInjector: DispatchingAndroidInjector<Fragment>
 
     @Inject
     lateinit var dispatchingBroadcastInjector: DispatchingAndroidInjector<BroadcastReceiver>
@@ -36,7 +36,7 @@ class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasB
         return dispatchingAndroidInjector
     }
 
-    override fun supportFragmentInjector(): AndroidInjector<androidx.fragment.app.Fragment> {
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
         return dispatchingFragmentInjector
     }
 

@@ -24,7 +24,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showAlert() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_ALERTS)
                 .setContentText(context.getString(R.string.notification_alerts_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setPriority(Notification.PRIORITY_MAX)
@@ -42,7 +42,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showBadAfterShortage() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
                 .setContentText(context.getString(R.string.notification_alerts_shortage_over_air_bad_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.RED)
@@ -59,7 +59,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showImprovement() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_IMPROVEMENT)
                 .setContentText(context.getString(R.string.notification_improvement_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_info_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.GREEN)
@@ -76,7 +76,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showLikelyOk() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_IMPROVEMENT)
                 .setContentText(context.getString(R.string.notification_likely_ok_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_info_outline_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.GREEN)
@@ -93,7 +93,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showDataShortage() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
                 .setContentText(context.getString(R.string.notification_data_shortage_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
@@ -110,7 +110,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showAirIsOkAfterShortage() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_DATA_SHORTAGE)
                 .setContentText(context.getString(R.string.notification_data_shortage_over_air_ok_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_info_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.GREEN)
@@ -127,7 +127,7 @@ class NotificationHelper @Inject constructor(private val context: Application) {
     fun showError() {
         val b = NotificationCompat.Builder(context, CHANNEL_ID_ERRORS)
                 .setContentText(context.getString(R.string.notification_error_message))
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.ic_warning_white_24dp)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setColor(Color.YELLOW)
