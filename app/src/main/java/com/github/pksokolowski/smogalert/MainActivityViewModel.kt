@@ -3,14 +3,12 @@ package com.github.pksokolowski.smogalert
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import android.os.AsyncTask
 import com.github.pksokolowski.smogalert.job.AirCheckParams
 import com.github.pksokolowski.smogalert.job.JobsHelper
 import com.github.pksokolowski.smogalert.job.SettingsValidator
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogData
 import javax.inject.Inject
 
 class MainActivityViewModel @Inject constructor(private val airQualityLogsRepository: AirQualityLogsRepository,
@@ -30,19 +28,36 @@ class MainActivityViewModel @Inject constructor(private val airQualityLogsReposi
     fun getDownloadStatus() = isDownloadInProgress as LiveData<Boolean>
     fun getSensitivity() = sensitivity as LiveData<Int>
 
-    fun checkCurrentAirQuality() = GlobalScope.launch(Dispatchers.Main) {
-        isDownloadInProgress.value = true
-        withContext(Dispatchers.IO) {
-            val result = airQualityLogsRepository.getLatestLogData()
-            if (!result.isFromCache) jobsHelper.reschedule()
-        }
-        isDownloadInProgress.value = false
+    fun checkCurrentAirQuality() {
+        val task = AirQualityDataFetcher(airQualityLogsRepository, jobsHelper, isDownloadInProgress)
+        task.execute()
     }
 
     fun setSensitivity(sensitivity: Int) {
         val params = AirCheckParams(sensitivity)
         jobsHelper.scheduleAirQualityCheckJob(params)
         this.sensitivity.value = sensitivity
+        checkCurrentAirQuality()
+    }
+
+    private class AirQualityDataFetcher(private val repo: AirQualityLogsRepository,
+                                        private val jobsHelper: JobsHelper,
+                                        private val isDownloadInProgress: MutableLiveData<Boolean>) : AsyncTask<Void, Void, LogData>() {
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            isDownloadInProgress.value = true
+        }
+
+        override fun doInBackground(vararg params: Void?): LogData {
+            return repo.getLatestLogData()
+        }
+
+        override fun onPostExecute(result: LogData) {
+            super.onPostExecute(result)
+            if (!result.isFromCache) jobsHelper.reschedule()
+            isDownloadInProgress.value = false
+        }
     }
 
 }
