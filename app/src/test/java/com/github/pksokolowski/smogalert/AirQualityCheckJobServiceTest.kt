@@ -11,11 +11,10 @@ import com.github.pksokolowski.smogalert.notifications.NotificationHelper
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository
 import com.github.pksokolowski.smogalert.repository.AirQualityLogsRepository.LogsData
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.Spy
@@ -31,7 +30,9 @@ class AirQualityCheckJobServiceTest {
         third = AirQualityLog(1, 1, PollutionDetails(9199999), 123, 0, 1, 1)
         airCheckParams = AirCheckParams(1, false)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verify(mockJobsHelper).scheduleOneTimeRetry(airCheckParams.sensitivity)
     }
 
@@ -42,7 +43,9 @@ class AirQualityCheckJobServiceTest {
         third = AirQualityLog(1, 1, PollutionDetails(9199999), 123, 0, 1, 1)
         airCheckParams = AirCheckParams(1, false)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verify(mockJobsHelper, never()).scheduleOneTimeRetry(anyInt())
     }
 
@@ -53,7 +56,9 @@ class AirQualityCheckJobServiceTest {
         third = AirQualityLog(1, 1, PollutionDetails(9199999), 123, 0, 1, 1)
         airCheckParams = AirCheckParams(1, true)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verify(mockJobsHelper, never()).scheduleOneTimeRetry(anyInt())
     }
 
@@ -63,7 +68,9 @@ class AirQualityCheckJobServiceTest {
         previous = AirQualityLog(1, 1, PollutionDetails(1111111), 100, 0, 1, 1)
         airCheckParams = AirCheckParams(1, false)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verify(mockNotificationHelper).showAlert()
     }
 
@@ -73,7 +80,9 @@ class AirQualityCheckJobServiceTest {
         previous = AirQualityLog(1, 1, PollutionDetails(1111111), 100, 0, 1, 1)
         airCheckParams = AirCheckParams(1, false)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verifyZeroInteractions(mockNotificationHelper)
     }
 
@@ -83,7 +92,9 @@ class AirQualityCheckJobServiceTest {
         previous = AirQualityLog(1, -1, PollutionDetails(9999999), 110, 1, 1, 0)
         airCheckParams = AirCheckParams(1, true)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verify(mockNotificationHelper).showError()
     }
 
@@ -93,7 +104,9 @@ class AirQualityCheckJobServiceTest {
         previous = AirQualityLog(1, 2, PollutionDetails(2299999), 110, 0, 1, 1, SensorsPresence(127))
         airCheckParams = AirCheckParams(3, false)
 
-        jobService.onStartJob(mockJobParameters)
+        runBlocking {
+            jobService.launchAQCheck(mockJobParameters).join()
+        }
         verify(mockNotificationHelper).showLikelyOk()
     }
 
