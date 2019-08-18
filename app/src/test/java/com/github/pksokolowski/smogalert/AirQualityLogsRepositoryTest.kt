@@ -1,7 +1,7 @@
 package com.github.pksokolowski.smogalert
 
-import androidx.lifecycle.LiveData
 import android.location.Location
+import androidx.lifecycle.LiveData
 import com.github.pksokolowski.smogalert.api.AirQualityService
 import com.github.pksokolowski.smogalert.api.models.AirQualityModel
 import com.github.pksokolowski.smogalert.db.AirQualityLog
@@ -20,10 +20,9 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SE
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM10
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_PM25
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_SO2
-import org.junit.Assert.assertEquals
 import okhttp3.Request
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.anyLong

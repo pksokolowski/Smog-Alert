@@ -1,6 +1,6 @@
 package android.os
 
-class PersistableBundle() {
+class PersistableBundle {
     private val map = HashMap<String, Any>()
 
     fun putInt(key: String, value: Int) {

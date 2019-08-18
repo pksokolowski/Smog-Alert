@@ -38,7 +38,7 @@ class ActiveLocationRequestHelper : BroadcastReceiver() {
         private var lastActivelyFetchedLocation: Location? = null
         private var isLocationReady: Boolean = false
 
-        private val lock = java.lang.Object()
+        private val lock = Object()
 
         fun getLocation(context: Context): Location? = synchronized(lock) {
             lastActivelyFetchedLocation = null

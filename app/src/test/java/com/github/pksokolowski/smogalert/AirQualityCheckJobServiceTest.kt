@@ -14,8 +14,6 @@ import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.Spy

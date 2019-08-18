@@ -5,7 +5,6 @@ import android.content.res.Resources
 import com.github.pksokolowski.smogalert.db.AirQualityLog
 import com.github.pksokolowski.smogalert.db.PollutionDetails
 import com.github.pksokolowski.smogalert.utils.ErrorExplanationHelper
-import com.github.pksokolowski.smogalert.utils.SeasonalKeyPollutantsHelper
 import com.github.pksokolowski.smogalert.utils.SensorsPresence
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_C6H6
 import com.github.pksokolowski.smogalert.utils.SensorsPresence.Companion.FLAG_SENSOR_CO
@@ -23,7 +22,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.RuntimeException
 
 @RunWith(MockitoJUnitRunner::class)
 class ErrorExplanationHelperTest {

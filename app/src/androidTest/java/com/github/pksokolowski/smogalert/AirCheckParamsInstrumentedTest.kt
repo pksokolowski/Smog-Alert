@@ -2,7 +2,6 @@ package com.github.pksokolowski.smogalert
 
 import android.os.PersistableBundle
 import com.github.pksokolowski.smogalert.job.AirCheckParams
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -11,7 +10,7 @@ class AirCheckParamsInstrumentedTest {
     fun retrievesCorrectValueGivenIntInConstruction() {
         val params = AirCheckParams(2)
         val retrieved = params.sensitivity
-        Assert.assertEquals(2, retrieved)
+        assertEquals(2, retrieved)
     }
 
     @Test
@@ -29,14 +28,14 @@ class AirCheckParamsInstrumentedTest {
     fun knowsWhenJobIsRetryWhileItIs() {
         val params = AirCheckParams(2, true)
         val retrieved = params.isOneTimeRetry
-        Assert.assertEquals(true, retrieved)
+        assertEquals(true, retrieved)
     }
 
     @Test
     fun knowsWhenJobIsNotRetryWhileItIsNot() {
         val params = AirCheckParams(2, false)
         val retrieved = params.isOneTimeRetry
-        Assert.assertEquals(false, retrieved)
+        assertEquals(false, retrieved)
     }
 
     @Test
@@ -47,7 +46,7 @@ class AirCheckParamsInstrumentedTest {
         }
         val params = AirCheckParams(bundle)
         val retrieved = params.isOneTimeRetry
-        Assert.assertEquals(true, retrieved)
+        assertEquals(true, retrieved)
     }
 
     @Test
@@ -58,15 +57,15 @@ class AirCheckParamsInstrumentedTest {
         }
         val params = AirCheckParams(bundle)
         val retrieved = params.isOneTimeRetry
-        Assert.assertEquals(false, retrieved)
+        assertEquals(false, retrieved)
     }
 
     @Test
     fun doesSaveBothParametersCorrectlyInTheBundle() {
         val params = AirCheckParams(AirCheckParams(2, true).getExtras())
 
-        Assert.assertEquals(true, params.isOneTimeRetry)
-        Assert.assertEquals(2, params.sensitivity)
+        assertEquals(true, params.isOneTimeRetry)
+        assertEquals(2, params.sensitivity)
     }
 
     companion object {
