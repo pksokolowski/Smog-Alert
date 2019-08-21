@@ -1,27 +1,16 @@
 package com.github.pksokolowski.smogalert.di
 
-import android.app.Activity
 import android.app.Application
-import android.app.Service
-import android.content.BroadcastReceiver
-import androidx.fragment.app.Fragment
-import dagger.android.*
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasAndroidInjector
 import javax.inject.Inject
 
-class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasBroadcastReceiverInjector, HasServiceInjector {
-
+class App : Application(), HasAndroidInjector {
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+    lateinit var androidInjector: DispatchingAndroidInjector<Any>
 
-    @Inject
-    lateinit var dispatchingFragmentInjector: DispatchingAndroidInjector<Fragment>
-
-    @Inject
-    lateinit var dispatchingBroadcastInjector: DispatchingAndroidInjector<BroadcastReceiver>
-
-    @Inject
-    lateinit var dispatchingServiceInjector: DispatchingAndroidInjector<Service>
+    override fun androidInjector(): AndroidInjector<Any> = androidInjector
 
     override fun onCreate() {
         super.onCreate()
@@ -30,21 +19,5 @@ class App : Application(), HasActivityInjector, HasSupportFragmentInjector, HasB
                 .application(this)
                 .build()
                 .inject(this)
-    }
-
-    override fun activityInjector(): AndroidInjector<Activity> {
-        return dispatchingAndroidInjector
-    }
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return dispatchingFragmentInjector
-    }
-
-    override fun broadcastReceiverInjector(): AndroidInjector<BroadcastReceiver> {
-        return dispatchingBroadcastInjector
-    }
-
-    override fun serviceInjector(): AndroidInjector<Service> {
-        return dispatchingServiceInjector
     }
 }
