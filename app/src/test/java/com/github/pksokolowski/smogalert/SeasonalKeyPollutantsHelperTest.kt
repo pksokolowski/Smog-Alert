@@ -28,7 +28,7 @@ class SeasonalKeyPollutantsHelperTest{
     fun includesOzoneWhenMissingLaterOnInTheSeason(){
         val input = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25)
         val expected = SensorsPresence(FLAG_SENSOR_PM10 or FLAG_SENSOR_PM25 or FLAG_SENSOR_O3)
-        val result = seasonalHelper.includeKeyPollutants(input, getTimestampFromMonth(10, 31))
+        val result = seasonalHelper.includeKeyPollutants(input, getTimestampFromMonth(9, 30))
 
         assertEquals(expected, result)
     }

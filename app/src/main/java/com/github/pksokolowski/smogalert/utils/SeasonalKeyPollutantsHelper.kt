@@ -58,6 +58,6 @@ class SeasonalKeyPollutantsHelper @Inject constructor() {
         return calendar.get(Calendar.MONTH) + 1
     }
 
-    private fun isOzoneSeason(monthNumber: Int) = monthNumber in 4..10
+    private fun isOzoneSeason(monthNumber: Int) = monthNumber in 4..9
     private fun isPMSeason(monthNumber: Int) = (monthNumber > 8 || monthNumber < 6)
 }
