@@ -48,8 +48,8 @@ android {
 }
 
 dependencies {
-    def dagger_version = '2.24'
-    def room_version = "2.1.0"
+    def dagger_version = '2.25.2'
+    def room_version = '2.2.1'
 
     implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android-support:$dagger_version"

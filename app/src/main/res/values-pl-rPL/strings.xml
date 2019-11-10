@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Smog Light</string>
+    <string name="app_name">Smog Lite</string>
     <string name="notification_channel_alerts_title">Ostrzeżenia o smogu</string>
     <string name="notification_channel_alerts_description">Powiadomienia o wysokich stężeniach szkodliwych substancji w powietrzu.</string>
     <string name="notification_channel_improvement_title">Poprawa jakości powietrza</string>

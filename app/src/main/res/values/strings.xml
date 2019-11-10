@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Smog Light</string>
+    <string name="app_name">Smog Lite</string>
     <string name="notification_channel_alerts_title">Smog alerts</string>
     <string name="notification_channel_alerts_description">Notifications letting you know about poor air quality.</string>
     <string name="notification_channel_improvement_title">Air quality improvement</string>
